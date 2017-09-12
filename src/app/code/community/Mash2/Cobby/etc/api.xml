@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<config>
+    <api>
+        <resources>
+
+            <cobby_catalog_product_attribute_set translate="title" module="mash2_cobby">
+                <model>mash2_cobby/catalog_product_attribute_set_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby">
+                        <method>items</method>
+                    </export>
+                </methods>
+            </cobby_catalog_product_attribute_set>
+
+            <cobby_catalog_category translate="title" module="mash2_cobby">
+                <model>mash2_cobby/catalog_category_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_catalog_category>
+
+            <cobby_catalog_product translate="title" module="mash2_cobby">
+                <model>mash2_cobby/catalog_product_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <updateSkus translate="title" module="mash2_cobby"/>
+                    <getAllIds translate="title" module="mash2_cobby"/>
+                    <updateWebsites translate="title" module="mash2_cobby" />
+                </methods>
+            </cobby_catalog_product>
+
+            <cobby_catalog_product_attribute translate="title" module="mash2_cobby">
+                <model>mash2_cobby/catalog_product_attribute_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <info translate="title" module="mash2_cobby"/>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+                <faults module="catalog">
+                    <attribute_not_exists>
+                        <code>-32001</code>
+                        <message>Requested attribute not found.</message>
+                    </attribute_not_exists>
+                </faults>
+            </cobby_catalog_product_attribute>
+
+            <cobby_catalog_product_attribute_option>
+                <model>mash2_cobby/catalog_product_attribute_option_api</model>
+                <methods>
+                    <import translate="title" module="mash2_cobby"/>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_catalog_product_attribute_option>
+
+            <cobby_catalog_product_type_configurable>
+                <model>mash2_cobby/catalog_product_type_configurable_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <assign translate="title" module="catalog"/>
+                </methods>
+            </cobby_catalog_product_type_configurable>
+
+            <cobby_core_website translate="title" module="mash2_cobby">
+                <model>mash2_cobby/core_website_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_website>
+
+            <cobby_core_store>
+                <model>mash2_cobby/core_store_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_store>
+
+            <cobby_storegroup>
+                <model>mash2_cobby/core_store_group_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_storegroup>
+
+            <cobby_core_config>
+                <model>mash2_cobby/core_config_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_config>
+
+            <cobby_core_debug>
+                <model>mash2_cobby/core_debug_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_debug>
+
+            <cobby_core_acl>
+                <model>mash2_cobby/core_acl_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_acl>
+
+            <cobby_customer_group>
+                <model>mash2_cobby/customer_group_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_customer_group>
+
+            <cobby_export>
+                <model>mash2_cobby/export_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <exportProducts translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_export>
+
+            <cobby_import_product>
+                <model>mash2_cobby/import_product_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <updateCategoryAssociations translate="title" module="mash2_cobby"/>
+                    <importProducts translate="title" module="mash2_cobby"/>
+                    <updateStock translate="title" module="mash2_cobby"/>
+                    <updateLink translate="title" module="mash2_cobby"/>
+                    <updateGroupedProductAssociations translate="title" module="mash2_cobby"/>
+                    <updateConfigurableProducts translate="title" module="mash2_cobby"/>
+                    <updateMedia translate="title" module="mash2_cobby"/>
+                    <updateTierPrices translate="title" module="mash2_cobby"/>
+                    <updateGroupPrices translate="title" module="mash2_cobby"/>
+                    <deleteDuplicateImages translate="title" module="mash2_cobby"/>
+                    <updateUrl translate="title" module="mash2_cobby"/>
+                    <updateCustomOptions translate="title" module="mash2_cobby"/>
+                    <updateBundleOptions translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_import_product>
+
+            <cobby_indexer>
+                <model>mash2_cobby/indexer_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <changeStatus translate="title" module="mash2_cobby" />
+                    <export translate="title" module="mash2_cobby"/>
+                    <reindexProducts translate="title" module="mash2_cobby" />
+                </methods>
+            </cobby_indexer>
+
+            <cobby_queue>
+                <model>mash2_cobby/queue_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <export translate="title" module="mash2_cobby"/>
+                    <getMaxQueueId translate="title" module="mash2_cobby" />
+					<reset translate="title" module="mash2_cobby" />
+                </methods>
+            </cobby_queue>
+
+            <cobby_core_translate>
+                <model>mash2_cobby/core_translate_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <getTranslation translate="title" module="mash2_cobby"/>
+                    <getLocales translate="title" module="mash2_cobby"/>
+                </methods>
+            </cobby_core_translate>
+
+            <cobby_cache>
+                <model>mash2_cobby/cache_api</model>
+                <acl>cobby</acl>
+                <methods>
+                    <purgeProducts translate="title" module="mash2_cobby" />
+                    <purgeCategories translate="title" module="mash2_cobby" />
+                </methods>
+            </cobby_cache>
+        </resources>
+
+        <resources_alias>
+            <cobby_website>cobby_website</cobby_website>
+            <cobby_store>cobby_store</cobby_store>
+            <cobby_storegroup>cobby_storegroup</cobby_storegroup>
+            <cobby_core>cobby_core</cobby_core>
+        </resources_alias>
+
+        <acl>
+            <resources>
+                <cobby translate="title" module="mash2_cobby"/>
+            </resources>
+        </acl>
+
+        <adapters>
+            <mash2_cobby_json>
+                <model>mash2_cobby/api_server_adapter_json</model>
+                <handler>mash2_cobby_json</handler>
+                <active>1</active>
+            </mash2_cobby_json>
+            <mash2_cobby_html>
+                <model>mash2_cobby/api_server_adapter_html</model>
+                <handler>mash2_cobby_json</handler>
+                <active>1</active>
+            </mash2_cobby_html>
+        </adapters>
+        <handlers>
+            <mash2_cobby_json>
+                <model>mash2_cobby/api_server_handler_json</model>
+            </mash2_cobby_json>
+        </handlers>
+    </api>
+</config>

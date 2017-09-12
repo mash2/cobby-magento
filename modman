@@ -1,0 +1,6 @@
+src/app/code/community/Mash2/Cobby app/code/community/Mash2/Cobby/
+src/app/etc/modules/Mash2_Cobby.xml app/etc/modules/Mash2_Cobby.xml
+src/app/locale/de_DE/Mash2_Cobby.csv app/locale/de_DE/Mash2_Cobby.csv
+src/app/locale/en_US/Mash2_Cobby.csv app/locale/en_US/Mash2_Cobby.csv
+src/app/design/adminhtml/default/default/layout/cobby.xml app/design/adminhtml/default/default/layout/cobby.xml
+src/app/design/adminhtml/default/default/template/cobby app/design/adminhtml/default/default/template/cobby

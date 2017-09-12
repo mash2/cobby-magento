@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<config>
+    <sections>
+        <cobby translate="">
+            <label>cobby</label>
+            <tab>service</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <groups>
+                <settings module="mash2_cobby" translate="label">
+                    <label>General Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <expanded>1</expanded>
+                    <fields>
+
+                        <license_key module="mash2_cobby" translate="label tooltip">
+                            <label>License key</label>
+                            <frontend_type>text</frontend_type>
+                            <tooltip>The license key will be sent via email.</tooltip>
+                            <validate>validate-alphanum required-entry</validate>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </license_key>
+
+                        <contact_email module="mash2_cobby" translate="label comment tooltip">
+                            <label>Contact Email</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>All cobby notifications will be sent to the Contact Email.</comment>
+                            <tooltip>Notifictaions for rebuilt indexes, Errors, available cobby Updates and more will be sent to this Email. No Newsletter or commercials.</tooltip>
+                            <sort_order>20</sort_order>
+                            <validate>validate-email required-entry</validate>
+                            <show_in_default>1</show_in_default>
+                        </contact_email>
+
+                        <choose_user module="mash2_cobby" translate="label comment">
+                            <label>Choose Web Service User</label>
+                            <sort_order>30</sort_order>
+                            <frontend_type>select</frontend_type>
+                            <comment>Use an existing webservice user with ACL right for cobby or create a new user.</comment>
+                            <source_model>mash2_cobby/system_config_source_chooseuser</source_model>
+                            <validate>validate-select</validate>
+                            <show_in_default>1</show_in_default>
+                        </choose_user>
+
+                        <!-- existing user -->
+                        <api_user module="mash2_cobby" translate="label">
+                            <label>User Name</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mash2_cobby/system_config_source_api_user</source_model>
+                            <sort_order>40</sort_order>
+                            <validate>validate-select</validate>
+                            <show_in_default>1</show_in_default>
+                            <depends><choose_user>1</choose_user></depends>
+                        </api_user>
+                        <api_key module="mash2_cobby" translate="label comment tooltip">
+                            <label>API Key</label>
+                            <frontend_type>obscure</frontend_type>
+                            <tooltip>Only users with ACL for cobby will be shown.</tooltip>
+                            <comment>Fill in the API key of the chosen user.</comment>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>50</sort_order>
+                            <validate>required-entry</validate>
+                            <show_in_default>1</show_in_default>
+                            <depends>
+                                <choose_user>1</choose_user>
+                            </depends>
+                        </api_key>
+
+                        <!-- new user -->
+                        <new_api_user module="mash2_cobby" translate="label">
+                            <label>User Name</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <validate>required-entry</validate>
+                            <show_in_default>1</show_in_default>
+                            <depends>
+                                <choose_user>2</choose_user>
+                            </depends>
+                        </new_api_user>
+                        <new_api_key module="mash2_cobby" translate="label comment">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>The API Key is the password for this user.</comment>
+                            <backend_model>mash2_cobby/system_config_password_random</backend_model>
+                            <sort_order>50</sort_order>
+                            <validate>validate-admin-password required-entry</validate>
+                            <show_in_default>1</show_in_default>
+                            <depends>
+                                <choose_user>2</choose_user>
+                            </depends>
+                        </new_api_key>
+
+
+                    </fields>
+                </settings>
+
+                <stock module="mash2_cobby" translate="label">
+                    <label>Stock Settings</label>
+                    <frontend_type>text</frontend_type>
+                    <expanded>0</expanded>
+                    <sort_order>200</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <fields>
+                        <manage module="mash2_cobby" translate="label tooltip">
+                            <label>Stock Management</label>
+                            <frontend_type>select</frontend_type>
+                            <tooltip>change how cobby handles the stock-attributes. Set disabled/readonly to disallow changes to stock from cobby</tooltip>
+                            <source_model>mash2_cobby/system_config_source_managestock</source_model>
+                            <validate>validate-select</validate>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </manage>
+                        <quantity_readonly module="mash2_cobby" translate="label tooltip">
+                            <label>Default Quantity</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>fixed constant to use for new products</comment>
+                            <tooltip>what shall cobby transmit for Quantity on product-creation?</tooltip>
+                            <config_path>cobby/stock/quantity</config_path>
+                            <sort_order>20</sort_order>
+                            <depends><manage>1</manage></depends>
+                            <show_in_default>1</show_in_default>
+                            <validate>validate-number required-entry</validate>
+                        </quantity_readonly>
+                        <availability_readonly module="mash2_cobby" translate="label tooltip">
+                            <label>Default Stock Availability</label>
+                            <frontend_type>select</frontend_type>
+                            <tooltip>what shall cobby transmit for Stock availability on product-creation?</tooltip>
+                            <comment>fixed constant to use for new products</comment>
+                            <source_model>catalogInventory/source_stock</source_model>
+                            <config_path>cobby/stock/availability</config_path>
+                            <validate>validate-select</validate>
+                            <sort_order>30</sort_order>
+                            <depends><manage>1</manage></depends>
+                            <show_in_default>1</show_in_default>
+                        </availability_readonly>
+                        <quantity_disabled module="mash2_cobby" translate="label tooltip">
+                            <label>Default Quantity</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>fixed constant to use for new products</comment>
+                            <tooltip>what shall cobby transmit for Quantity on product-creation?</tooltip>
+                            <config_path>cobby/stock/quantity</config_path>
+                            <sort_order>20</sort_order>
+                            <depends><manage>2</manage></depends>
+                            <show_in_default>1</show_in_default>
+                            <validate>validate-number required-entry</validate>
+                        </quantity_disabled>
+                        <availability_disabled module="mash2_cobby" translate="label tooltip">
+                            <label>Default Stock Availability</label>
+                            <frontend_type>select</frontend_type>
+                            <tooltip>what shall cobby transmit for Stock availability on product-creation?</tooltip>
+                            <comment>fixed constant to use for new products</comment>
+                            <source_model>catalogInventory/source_stock</source_model>
+                            <config_path>cobby/stock/availability</config_path>
+                            <validate>validate-select</validate>
+                            <sort_order>30</sort_order>
+                            <depends><manage>2</manage></depends>
+                            <show_in_default>1</show_in_default>
+                        </availability_disabled>
+                    </fields>
+                </stock>
+
+                <htaccess module="mash2_cobby" translate="label">
+                    <label>.htaccess</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>300</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <fields>
+                        <user module="mash2_cobby" translate="label">
+                            <label>.htaccess user</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </user>
+                        <password module="mash2_cobby" translate="label">
+                            <label>.htaccess password</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </password>
+                    </fields>
+                </htaccess>
+
+                <magento module="mash2_cobby" translate="label">
+                    <label>Advanced</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>400</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <fields>
+                        <overwrite_images module="mash2_cobby" translate="label comment">
+                            <label>Overwrite Images</label>
+                            <comment>Overwrite existing images with same names to prevent creation of duplicates.</comment>
+                            <sort_order>51</sort_order>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <config_path>cobby/settings/overwrite_images</config_path>
+                        </overwrite_images>
+                        <clear_cache module="mash2_cobby" translate="label tooltip">
+                            <label>Clear Cache</label>
+                            <sort_order>52</sort_order>
+                            <tooltip>Clears external cache engines (e.g. Varnish) after product upload. Clears just affected entries. Takes longer especially with product links and many category associations.</tooltip>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <config_path>cobby/settings/clear_cache</config_path>
+                        </clear_cache>
+                    </fields>
+                </magento>
+
+                <version>
+                    <sort_order>500</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <expanded>1</expanded>
+                    <fields>
+                        <cobby_version module="mash2_cobby">
+                            <label>cobby Version</label>
+                            <frontend_type>label</frontend_type>
+                            <sort_order>35</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <config_path>cobby/settings/cobby_version</config_path>
+                        </cobby_version>
+                    </fields>
+                </version>
+            </groups>
+        </cobby>
+    </sections>
+</config>

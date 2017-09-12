@@ -1,0 +1,6 @@
+<?php if (!$this->isInitialized()): ?>
+<div class="notification-global">
+    <strong><?php echo $this->helper('mash2_cobby')->__('Cobby has been installed.') ?></strong>
+    <?php echo $this->helper('mash2_cobby')->__('Click <a href="%s">here</a> to set up your account.', $this->getConfigUrl()) ?>
+</div>
+<?php endif ?>

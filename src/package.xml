@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<package>
+  <name>Mash2_Cobby</name>
+  <version>1.26.1.1</version>
+  <stability>stable</stability>
+  <license>Lizenz</license>
+  <channel>community</channel>
+  <extends />
+  <summary>cobby</summary>
+  <description>cobby</description>
+  <notes>cobby</notes>
+  <authors>
+    <author>
+      <name>Eduard Giesbrecht</name>
+      <user>eduard</user>
+      <email>eduard.giesbrecht@mash2.com</email>
+    </author>
+  </authors>
+  <date>2015-04-08</date>
+  <time>08:39:19</time>
+  <contents>
+    <target name="magedesign">
+      <dir name="adminhtml">
+        <dir name="default">
+          <dir name="default">
+            <dir name="layout">
+              <file name="cobby.xml" hash="389caa3b5e7c2bf14e20edc565d4daf5" />
+            </dir>
+            <dir name="template">
+              <dir name="cobby">
+                <file name="notifications.phtml" hash="67bb5e8c83072c3ecc61737a1d34177d" />
+              </dir>
+            </dir>
+          </dir>
+        </dir>
+      </dir>
+    </target>
+    <target name="mageetc">
+      <dir name="modules">
+        <file name="Mash2_Cobby.xml" hash="d50ed8d67b48a983f0ff14556177cc31" />
+      </dir>
+    </target>
+    <target name="magelocale">
+      <dir name="locale">
+        <dir name="de_DE">
+          <file name="Mash2_Cobby.csv" hash="109e0f97d36ebf8c6a535f098cea5e8c" />
+        </dir>
+        <dir name="en_US">
+          <file name="Mash2_Cobby.csv" hash="cc7cf3936c8dd2731571c368c6cc314a" />
+        </dir>
+        <dir name="fr_FR">
+          <file name="Mash2_Cobby.csv" hash="18e80c0e03ee8be1d22642e62982ef6f" />
+        </dir>
+        <dir name="pl_PL">
+          <file name="Mash2_Cobby.csv" hash="be36c3c65a27bb20d9a7b16b8872f6d7" />
+        </dir>
+      </dir>
+    </target>
+    <target name="magecommunity">
+      <dir name="community">
+        <dir name="Mash2">
+          <dir name="Cobby">
+            <dir name="Block">
+              <dir name="Adminhtml">
+                <file name="Notifications.php" hash="17642c26168d012934cf0fc858bca3c8" />
+              </dir>
+            </dir>
+            <dir name="controllers">
+              <file name="Mash2Controller.php" hash="950a9ec32615db9a464201f2ce59dcc1" />
+            </dir>
+            <dir name="etc">
+              <file name="adminhtml.xml" hash="a55d9bb4f33086d8dd7ed8d967c051b4" />
+              <file name="api.xml" hash="7bdef4fe881a85b57e98a000c1079ca5" />
+              <file name="config.xml" hash="494d7ed50059ba81aaa145115be8ccef" />
+              <file name="system.xml" hash="ad044e3379d2795e16db1ff2224c60e6" />
+            </dir>
+            <dir name="Helper">
+              <file name="Cobbyapi.php" hash="6f797c27f919d5fff9d579d203e4c9de" />
+              <file name="Data.php" hash="51ed0ec897d277cd03a446fe976e58d3" />
+              <file name="Queue.php" hash="12e1a98de5d210f33d6c901e2a313d45" />
+              <file name="Resource.php" hash="da47e36b3be065efb24dff28be73c6ac" />
+              <file name="Settings.php" hash="3a7aeeaa47541f807ce481177f829f7f" />
+            </dir>
+            <dir name="Model">
+              <file name="ArrayAdapter.php" hash="925dc9ee5a88465edba2ed7d4b443953" />
+              <file name="Observer.php" hash="9db0281f77c64c462968e14207f02a7c" />
+              <file name="Product.php" hash="f3f78dbedab4285ac7762d1c916796dc" />
+              <file name="Queue.php" hash="1a10a35c20b6b8f31f2394886ac7c68b" />
+              <dir name="Admin">
+                <file name="Session.php" hash="d4a92e25c76442983e55787d15c4d2bf" />
+              </dir>
+              <dir name="Api">
+                <dir name="Server">
+                  <dir name="Adapter">
+                    <file name="Html.php" hash="5a9c0916f4bc8c097db1cb04ee18f081" />
+                    <file name="Json.php" hash="80bfad6a7c0dd26019e2db0582711afd" />
+                  </dir>
+                  <dir name="Handler">
+                    <file name="Json.php" hash="02f450e02ec5443b491df70395cb14e0" />
+                  </dir>
+                </dir>
+              </dir>
+              <dir name="Cache">
+                <file name="Api.php" hash="aa13a58c3b18193e303612f900b48205" />
+              </dir>
+              <dir name="Catalog">
+                <dir name="Category">
+                  <file name="Api.php" hash="5806ea92fbac102b32953f7597c9f910" />
+                </dir>
+                <dir name="Product">
+                  <file name="Api.php" hash="33bd8475eedd757b0c501e1ffad41355" />
+                  <dir name="Attribute">
+                    <file name="Api.php" hash="d6d6934f4643ed03002404c7113e9081" />
+                    <dir name="Option">
+                      <file name="Api.php" hash="24d5bac525dd300cc38d50d1b3ed5939" />
+                    </dir>
+                    <dir name="Set">
+                      <file name="Api.php" hash="29c9d0c8055d8cb07c7604ec0c99a4e6" />
+                    </dir>
+                  </dir>
+                  <dir name="Type">
+                    <dir name="Configurable">
+                      <file name="Api.php" hash="c5454f62d42650bb3670ab61edefcce2" />
+                    </dir>
+                  </dir>
+                </dir>
+              </dir>
+              <dir name="Core">
+                <file name="Translate.php" hash="33ea8d6c07cc718bf78a59b64b2baaf3" />
+                <dir name="Acl">
+                  <file name="Api.php" hash="a6237334064159786750256544877ee4" />
+                </dir>
+                <dir name="Config">
+                  <file name="Api.php" hash="8daf3afe6eab1bea42dc0d36e6b25e95" />
+                </dir>
+                <dir name="Debug">
+                  <file name="Api.php" hash="c53ac6b7a9f74bfcdf435d86017caabf" />
+                </dir>
+                <dir name="Store">
+                  <file name="Api.php" hash="587fb6dbda09dc8e385ba5c7fe8ff4c5" />
+                  <dir name="Group">
+                    <file name="Api.php" hash="3993fac280596301e797f9e182783c62" />
+                  </dir>
+                </dir>
+                <dir name="Translate">
+                  <file name="Api.php" hash="bd04d84f331d9489bfcdbc800470b27c" />
+                </dir>
+                <dir name="Website">
+                  <file name="Api.php" hash="08b6eaa787962a725da3c87403019a32" />
+                </dir>
+              </dir>
+              <dir name="Customer">
+                <dir name="Group">
+                  <file name="Api.php" hash="1be262e2f9727cfdf1df791bcf973df9" />
+                </dir>
+              </dir>
+              <dir name="Export">
+                <file name="Api.php" hash="a2d26e34e6b273ace9490e365d3a3192" />
+                <dir name="Entity">
+                  <file name="Product.php" hash="cddf5d31331c8b9f2a98012029e2d053" />
+                </dir>
+              </dir>
+              <dir name="Import">
+                <file name="Uploader.php" hash="38758decc2c9b68207900f7939ff370f" />
+                <dir name="Entity">
+                  <file name="Product.php" hash="bff9e7cfba83314989e855381100f6f3" />
+                  <dir name="Product">
+                    <dir name="Type">
+                      <file name="Bundle.php" hash="62c2f82ca8b87c228622d92c33af3f08" />
+                      <file name="Configurable.php" hash="fb4ad511b7b32b2d126756eb60b60e93" />
+                      <file name="Grouped.php" hash="03dcb11569c4577a39cc0055d88257c7" />
+                      <file name="Simple.php" hash="ab6892edee2205bf255b9647f465eabf" />
+                    </dir>
+                  </dir>
+                </dir>
+                <dir name="Product">
+                  <file name="Abstract.php" hash="b185f1f23e70df33ca8935a93f806adc" />
+                  <file name="Api.php" hash="15f5fff3f8782820960d8be9320832ea" />
+                  <file name="Bundleoption.php" hash="242ba2af3a68cff62a54de437085aad0" />
+                  <file name="Category.php" hash="8f7f5af7b904d2a0dcb1d13c757d4884" />
+                  <file name="Configurable.php" hash="f053e83756752b3375c9d15706427d0f" />
+                  <file name="Customoption.php" hash="78b864d3a03b27ddae63a9caa3ee9eda" />
+                  <file name="Grouped.php" hash="2d77e73da734599880a65e8bfa5cc3d8" />
+                  <file name="Groupprice.php" hash="d63af9b03029c08c9c6051adc47c63f3" />
+                  <file name="Link.php" hash="bc4a5e0d17dc8f19f2187727c2951136" />
+                  <file name="Media.php" hash="a50423362bebf5ce50ee90b8bcb58c31" />
+                  <file name="Stock.php" hash="e2b4cc72e762ea92621865b4fb9ddac7" />
+                  <file name="Tierprice.php" hash="ba166f0e4f6998c745913f4a48e33020" />
+                  <file name="Url.php" hash="3317f8b9fe0ea77df840926881727668" />
+                </dir>
+              </dir>
+              <dir name="Indexer">
+                <file name="Api.php" hash="51a5c32e9ad4394fa19cebc4f914a9ed" />
+                <file name="Sync.php" hash="5082f16ba49dd363ce93554c79ceecdd" />
+              </dir>
+              <dir name="Objectmodel">
+                <file name="Api.php" hash="006690031a4a0209e919afb94950f9d4" />
+              </dir>
+              <dir name="Queue">
+                <file name="Api.php" hash="c25e676d78e81b4d6f65735469b7dda9" />
+              </dir>
+              <dir name="Resource">
+                <file name="Product.php" hash="a860e7688361a156d2a1cb979608a647" />
+                <file name="Queue.php" hash="896c59e08d6dcf5f4aca6f6062f73163" />
+                <dir name="Catalog">
+                  <dir name="Product">
+                    <file name="Collection.php" hash="3d1d23825d6868af61dc0b5d02a34289" />
+                  </dir>
+                </dir>
+                <dir name="Indexer">
+                  <file name="Sync.php" hash="89e055c5ae315991354056b863c9804c" />
+                </dir>
+                <dir name="Product">
+                  <file name="Collection.php" hash="75708e089331e1674025509260e97843" />
+                </dir>
+                <dir name="Queue">
+                  <file name="Collection.php" hash="558dfb90d73ee4d2ecedecc63ebd0846" />
+                </dir>
+              </dir>
+              <dir name="Stock">
+                <file name="Item.php" hash="32685c474105d17137c46b1f71d1dbcc" />
+              </dir>
+              <dir name="System">
+                <dir name="Config">
+                  <dir name="Password">
+                    <file name="Random.php" hash="0bee2dc22d3fa27b116c5a124e3723be" />
+                  </dir>
+                  <dir name="Source">
+                    <file name="Chooseuser.php" hash="bd1338516954981053228678ef5c8e89" />
+                    <file name="Managestock.php" hash="607bfcf9c691ead902998491778e1314" />
+                    <dir name="Api">
+                      <file name="User.php" hash="ec537b2f053dfa06210c04b50ca59a85" />
+                    </dir>
+                  </dir>
+                </dir>
+              </dir>
+            </dir>
+            <dir name="sql">
+              <dir name="cobby_setup">
+                <file name="mysql4-upgrade-1.8.0.0-1.8.1.0.php" hash="6f16a3910a43a86725d49faa893d6053" />
+                <file name="upgrade-1.17.0.0-1.17.1.0.php" hash="ccdf9eab6dcda7f5137cf81098ce5fe5" />
+                <file name="upgrade-1.25.0.0-1.25.1.0.php" hash="de41992c1f352efb6597817cb02ac72a" />
+                <file name="upgrade-1.38.0.0-1.38.1.0.php" hash="1656eb1fba67be8760427d8ab4843313" />
+                <file name="upgrade-1.5.0.0-1.5.1.0.php" hash="9cdc48a91af233b42873f81ed41b4448" />
+              </dir>
+            </dir>
+          </dir>
+        </dir>
+      </dir>
+    </target>
+  </contents>
+  <compatible />
+  <dependencies>
+    <required>
+      <php>
+        <min>5.2.0</min>
+        <max>6.0.0</max>
+      </php>
+    </required>
+  </dependencies>
+</package>

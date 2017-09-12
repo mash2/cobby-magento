@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                    <catalog>
+                        <children>
+                            <products>
+                                <children>
+                                    <cobby_edit_product_inventory translate="title" module="mash2_cobby">
+                                        <title>Edit Product Inventory</title>
+                                    </cobby_edit_product_inventory>
+                                </children>
+                            </products>
+                        </children>
+                    </catalog>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <cobby translate="title" module="mash2_cobby">
+                                        <title>Cobby</title>
+                                        <sort_order>100</sort_order>
+                                    </cobby>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

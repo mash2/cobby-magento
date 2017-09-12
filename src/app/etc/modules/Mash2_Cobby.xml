@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Mash2_Cobby>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Api />
+            </depends>            
+        </Mash2_Cobby>
+    </modules>
+</config>

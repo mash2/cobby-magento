@@ -6,7 +6,7 @@
 product management for magento shops
 
 ## LICENSE
-[License](LICENSE.txt)
+[License](LICENSE.md)
 
 ## Releases
 [Releases](https://github.com/mash2/cobby-magento/releases)
