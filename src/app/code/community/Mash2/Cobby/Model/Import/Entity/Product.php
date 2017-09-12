@@ -75,6 +75,17 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         return $valueAttributes;
     }
 
+    protected function _getCobbyModels()
+    {
+        return array(
+            'simple'        => 'mash2_cobby/import_entity_product_type_simple',
+            'configurable'  => 'mash2_cobby/import_entity_product_type_configurable',
+            'virtual'       => 'mash2_cobby/import_entity_product_type_simple',
+            'grouped'       => 'mash2_cobby/import_entity_product_type_grouped',
+            'bundle'        => 'mash2_cobby/import_entity_product_type_bundle'
+        );
+    }
+
     /**
      * Initialize product type models.
      *
@@ -83,8 +94,9 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
      */
     protected function _initTypeModels()
     {
-        $config = Mage::getConfig()->getNode(self::CONFIG_KEY_PRODUCT_TYPES)->asCanonicalArray();
-        foreach ($config as $type => $typeModel) {
+        $typeMap = $this->_getCobbyModels();
+
+        foreach ($typeMap as $type => $typeModel) {
             if( !empty($this->_typeModels) && !in_array($type, $this->_typeModels))
                 continue;
 

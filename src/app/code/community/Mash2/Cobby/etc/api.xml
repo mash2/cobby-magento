@@ -143,6 +143,8 @@
                     <updateUrl translate="title" module="mash2_cobby"/>
                     <updateCustomOptions translate="title" module="mash2_cobby"/>
                     <updateBundleOptions translate="title" module="mash2_cobby"/>
+                    <start translate="title" module="mash2_cobby"/>
+                    <finish translate="title" module="mash2_cobby"/>
                 </methods>
             </cobby_import_product>
 

@@ -331,12 +331,12 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     /**
      * Get media uploader
      *
-     * @return Mash2_Cobby_Model_Import_Uploader
+     * @return Mage_ImportExport_Model_Import_Uploader
      */
     protected function _getUploader()
     {
         if (is_null($this->_fileUploader)) {
-            $this->_fileUploader    = new Mash2_Cobby_Model_Import_Uploader();
+            $this->_fileUploader    = new Mage_ImportExport_Model_Import_Uploader();
 
             $this->_fileUploader->init();
 

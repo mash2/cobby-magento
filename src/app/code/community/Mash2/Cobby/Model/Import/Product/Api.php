@@ -4,6 +4,9 @@
  */
 class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstract
 {
+    const START = 'start';
+    const FINISH = 'finish';
+
     /**
      * DB connection.
      *
@@ -170,5 +173,19 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
         $result = $model->import($data);
 
         return $result;
+    }
+
+    public function start()
+    {
+        Mage::dispatchEvent('cobby_import_product_started');
+
+        return true;
+    }
+
+    public function finish($entities)
+    {
+        Mage::dispatchEvent('cobby_import_product_finished', array('entities' => $entities));
+
+        return true;
     }
 }

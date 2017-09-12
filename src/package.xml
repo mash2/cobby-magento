@@ -70,8 +70,8 @@
             </dir>
             <dir name="etc">
               <file name="adminhtml.xml" hash="a55d9bb4f33086d8dd7ed8d967c051b4" />
-              <file name="api.xml" hash="7bdef4fe881a85b57e98a000c1079ca5" />
-              <file name="config.xml" hash="494d7ed50059ba81aaa145115be8ccef" />
+              <file name="api.xml" hash="8647b63143513189fa55ed27db93f226" />
+              <file name="config.xml" hash="ed60dd8379863efdb58414be70ccfe6d" />
               <file name="system.xml" hash="ad044e3379d2795e16db1ff2224c60e6" />
             </dir>
             <dir name="Helper">
@@ -161,9 +161,8 @@
                 </dir>
               </dir>
               <dir name="Import">
-                <file name="Uploader.php" hash="38758decc2c9b68207900f7939ff370f" />
                 <dir name="Entity">
-                  <file name="Product.php" hash="bff9e7cfba83314989e855381100f6f3" />
+                  <file name="Product.php" hash="e1a8005e099c39eea09a6a07f86e2bf9" />
                   <dir name="Product">
                     <dir name="Type">
                       <file name="Bundle.php" hash="62c2f82ca8b87c228622d92c33af3f08" />
@@ -175,7 +174,7 @@
                 </dir>
                 <dir name="Product">
                   <file name="Abstract.php" hash="b185f1f23e70df33ca8935a93f806adc" />
-                  <file name="Api.php" hash="15f5fff3f8782820960d8be9320832ea" />
+                  <file name="Api.php" hash="357993247a7aa0e13958799766083eb9" />
                   <file name="Bundleoption.php" hash="242ba2af3a68cff62a54de437085aad0" />
                   <file name="Category.php" hash="8f7f5af7b904d2a0dcb1d13c757d4884" />
                   <file name="Configurable.php" hash="f053e83756752b3375c9d15706427d0f" />
@@ -183,7 +182,7 @@
                   <file name="Grouped.php" hash="2d77e73da734599880a65e8bfa5cc3d8" />
                   <file name="Groupprice.php" hash="d63af9b03029c08c9c6051adc47c63f3" />
                   <file name="Link.php" hash="bc4a5e0d17dc8f19f2187727c2951136" />
-                  <file name="Media.php" hash="a50423362bebf5ce50ee90b8bcb58c31" />
+                  <file name="Media.php" hash="bb63e1431f1235259a0ed2f7355a2fff" />
                   <file name="Stock.php" hash="e2b4cc72e762ea92621865b4fb9ddac7" />
                   <file name="Tierprice.php" hash="ba166f0e4f6998c745913f4a48e33020" />
                   <file name="Url.php" hash="3317f8b9fe0ea77df840926881727668" />
