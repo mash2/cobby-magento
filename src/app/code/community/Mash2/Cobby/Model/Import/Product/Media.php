@@ -336,7 +336,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     protected function _getUploader()
     {
         if (is_null($this->_fileUploader)) {
-            $this->_fileUploader    = Mage::getModel("importexport/import_uploader", null);
+            $this->_fileUploader    = Mage::getModel('importexport/import_uploader', null);
 
             $this->_fileUploader->init();
 
