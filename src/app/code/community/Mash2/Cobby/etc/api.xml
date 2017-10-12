@@ -197,7 +197,7 @@
         <acl>
             <resources>
                 <cobby translate="title" module="mash2_cobby">
-                    <title>Cobby</title>
+                    <title>cobby</title>
                 </cobby>
             </resources>
         </acl>
