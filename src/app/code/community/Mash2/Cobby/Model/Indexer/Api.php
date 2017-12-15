@@ -244,7 +244,7 @@ class Mash2_Cobby_Model_Indexer_Api
             $result = $this->_runIndexer($index, $productIds);
         }
 
-        return $result;;
+        return $result;
     }
 
     private function _runIndexer($index, $productIds)
