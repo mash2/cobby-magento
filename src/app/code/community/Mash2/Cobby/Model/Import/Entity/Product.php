@@ -42,21 +42,21 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         parent::__construct();
     }
 
-     /**
+    /**
      * set Type Models
      *
      * @param $typeModels
      */
     public function setTypeModels($typeModels)
     {
-        if(!is_null($typeModels) && !empty($typeModels)){
+        if (!is_null($typeModels) && !empty($typeModels)) {
             $this->_typeModels = $typeModels;
         }
     }
 
     public function setUsedSkus($skus)
     {
-        if(!is_null($skus) && !empty($skus)){
+        if (!is_null($skus) && !empty($skus)) {
             $this->_usedSkus = $skus;
         }
     }
@@ -68,21 +68,21 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             ->load();
 
         $valueAttributes = array();
-        foreach($attributes as $attribute)
-        {
+        foreach ($attributes as $attribute) {
             $valueAttributes[] = $attribute->getAttributeCode();
         }
+
         return $valueAttributes;
     }
 
     protected function _getCobbyModels()
     {
         return array(
-            'simple'        => 'mash2_cobby/import_entity_product_type_simple',
-            'configurable'  => 'mash2_cobby/import_entity_product_type_configurable',
-            'virtual'       => 'mash2_cobby/import_entity_product_type_simple',
-            'grouped'       => 'mash2_cobby/import_entity_product_type_grouped',
-            'bundle'        => 'mash2_cobby/import_entity_product_type_bundle'
+            'simple' => 'mash2_cobby/import_entity_product_type_simple',
+            'configurable' => 'mash2_cobby/import_entity_product_type_configurable',
+            'virtual' => 'mash2_cobby/import_entity_product_type_simple',
+            'grouped' => 'mash2_cobby/import_entity_product_type_grouped',
+            'bundle' => 'mash2_cobby/import_entity_product_type_bundle'
         );
     }
 
@@ -97,13 +97,13 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         $typeMap = $this->_getCobbyModels();
 
         foreach ($typeMap as $type => $typeModel) {
-            if( !empty($this->_typeModels) && !in_array($type, $this->_typeModels))
+            if (!empty($this->_typeModels) && !in_array($type, $this->_typeModels))
                 continue;
 
             if (!($model = Mage::getModel($typeModel, array($this, $type)))) {
                 Mage::throwException("Entity type model '{$typeModel}' is not found");
             }
-            if (! $model instanceof Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract) {
+            if (!$model instanceof Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract) {
                 Mage::throwException(
                     Mage::helper('importexport')->__('Entity type model must be an instance of Mage_ImportExport_Model_Import_Entity_Product_Type_Abstract')
                 );
@@ -126,6 +126,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
      * Set import source
      *
      * @param $source
+     *
      * @return $this
      */
     public function setArraySource($source)
@@ -169,10 +170,10 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             $entityId = $rowData[self::COL_ENTITY_ID];
 
             if (!empty($entityId) && !isset($this->_oldSku[$sku])) { // can we get all necessary data from existant DB product?
-                $this->addRowError('sku ' .$sku. ' does not match product id ' .$entityId, $rowNum);
+                $this->addRowError('sku ' . $sku . ' does not match product id ' . $entityId, $rowNum);
             }
         }
-        
+
         return parent::validateRow($rowData, $rowNum);
     }
 
@@ -189,16 +190,16 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         $this->_saveProducts();
         $this->_saveCustomOptions();
         foreach ($this->_productTypeModels as $productType => $productTypeModel) {
-            if($productType != Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE){
+            if ($productType != Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 $productTypeModel->saveData();
             }
         }
-        Mage::dispatchEvent('catalog_product_import_finish_before', array('adapter'=>$this));
+        Mage::dispatchEvent('catalog_product_import_finish_before', array('adapter' => $this));
 
         return true;
     }
-	
-	public function getProcessedProducts()
+
+    public function getProcessedProducts()
     {
         return $this->_newSku;
     }
@@ -256,10 +257,10 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                             continue;
                         }
                     }
-                } elseif (null === $rowSku) {
+                } else if (null === $rowSku) {
                     $this->_rowsToSkip[$rowNum] = true;
                     continue; // skip rows when SKU is NULL
-                } elseif (self::SCOPE_STORE == $rowScope) { // set necessary data from SCOPE_DEFAULT row
+                } else if (self::SCOPE_STORE == $rowScope) { // set necessary data from SCOPE_DEFAULT row
                     $rowData[self::COL_TYPE] = $this->_newSku[$rowSku]['type_id'];
                     $rowData['attribute_set_id'] = $this->_newSku[$rowSku]['attr_set_id'];
                     $rowData[self::COL_ATTR_SET] = $this->_newSku[$rowSku]['attr_set_code'];
@@ -311,7 +312,6 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 ->_saveProductAttributes($attributes);
 
 
-
         }
 
         if (!empty($productIds)) {
@@ -336,6 +336,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
      * Retrieve attribute by specified code
      *
      * @param string $code
+     *
      * @return Mage_Eav_Model_Entity_Attribute_Abstract
      */
     protected function _getAttribute($code)
@@ -347,17 +348,58 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         if (!empty($backendModelName)) {
             $attribute->setBackendModel($backendModelName);
         }
+
         return $attribute;
+    }
+
+    /**
+     * Validate data rows and save bunches to DB.
+     *
+     * This function is overwritten, because cobby knows how many products are imported at once.
+     * To exceed the max bunchSize in some cases, the save method is reduced to its minimum function.
+     *
+     * @return Mage_ImportExport_Model_Import_Entity_Abstract
+     */
+    protected function _saveValidatedBunches()
+    {
+        $source = $this->_getSource();
+        $rows = array();
+
+        /** @var Mage_Core_Helper_Data $coreHelper */
+        $coreHelper = Mage::helper("core");
+
+        $source->rewind();
+        $this->_dataSourceModel->cleanBunches();
+
+        while ($source->valid()) {
+            if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
+                return;
+            }
+            $rowData = $coreHelper->unEscapeCSVData($source->current());
+
+            $this->_processedRowsCount++;
+
+            if ($this->validateRow($rowData, $source->key())) { // add row to bunch for save
+                $rowData = $this->_prepareRowForDb($rowData);
+                $rows[$source->key()] = $rowData;
+            }
+            $source->next();
+        }
+
+        $this->_dataSourceModel->saveBunch($this->getEntityTypeCode(), $this->getBehavior(), $rows);
+
+        return $this;
     }
 
     /**
      * Prepare attributes data
      *
-     * @param array $rowData
-     * @param int $rowScope
-     * @param array $attributes
+     * @param array       $rowData
+     * @param int         $rowScope
+     * @param array       $attributes
      * @param string|null $rowSku
-     * @param int $rowStore
+     * @param int         $rowStore
+     *
      * @return array
      */
     protected function _prepareAttributes($rowData, $rowScope, $attributes, $rowSku, $rowStore)
@@ -376,24 +418,22 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             $attrTable = $attribute->getBackend()->getTable();
             $storeIds = array(0);
 
-            if($attrValue != self::COBBY_DEFAULT)
-            {
-                if ('datetime' == $attribute->getBackendType())
-                {
+            if ($attrValue != self::COBBY_DEFAULT) {
+                if ('datetime' == $attribute->getBackendType()) {
                     if ($attrValue !== null && $attrValue != '')
                         $attrValue = gmstrftime($this->_getStrftimeFormat(), strtotime($attrValue));
                     else
-                        $attrValue = NULL;
-                } elseif('decimal' == $attribute->getBackendType() && $attrValue === ''){
-                    $attrValue = NULL;
-                } elseif ('url_key' == $attribute->getAttributeCode()) {
+                        $attrValue = null;
+                } else if ('decimal' == $attribute->getBackendType() && $attrValue === '') {
+                    $attrValue = null;
+                } else if ('url_key' == $attribute->getAttributeCode()) {
                     if (empty($attrValue)) {
                         $attrValue = $product->formatUrlKey($product->getName());
-                    }else {
+                    } else {
                         $attrValue = $product->formatUrlKey($product->getUrlKey());
 
                     }
-                } elseif ($backModel) {
+                } else if ($backModel) {
                     $attribute->getBackend()->beforeSave($product);
                     $attrValue = $product->getData($attribute->getAttributeCode());
                 }
@@ -403,7 +443,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 if (self::SCOPE_WEBSITE == $attribute->getIsGlobal()) {
                     // always init with storeIds from website
                     $storeIds = $this->_storeIdToWebsiteStoreIds[$rowStore];
-                } elseif (self::SCOPE_STORE == $attribute->getIsGlobal()) {
+                } else if (self::SCOPE_STORE == $attribute->getIsGlobal()) {
                     $storeIds = array($rowStore);
                 }
             }
@@ -420,15 +460,16 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             }
             $attribute->setBackendModel($backModel); // restore 'backend_model' to avoid 'default' setting
         }
+
         return $attributes;
     }
-
 
 
     /**
      * Save product attributes.
      *
      * @param array $attributesData
+     *
      * @return $this
      */
     protected function _saveProductAttributes(array $attributesData)
@@ -441,23 +482,23 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
                 foreach ($attributes as $attributeId => $storeValues) {
                     foreach ($storeValues as $storeId => $storeValue) {
-                        if ( $storeValue == self::COBBY_DEFAULT) {
+                        if ($storeValue == self::COBBY_DEFAULT) {
                             //TODO: evtl delete mit mehreren daten auf einmal
                             /** @var Magento_Db_Adapter_Pdo_Mysql $connection */
                             $connection = $this->_connection;
                             $connection->delete($tableName, array(
-                                'entity_id=?'      => (int) $productId,
-                                'entity_type_id=?' => (int) $this->_entityTypeId,
-                                'attribute_id=?'   => (int) $attributeId,
-                                'store_id=?'       => (int) $storeId,
+                                'entity_id=?' => (int)$productId,
+                                'entity_type_id=?' => (int)$this->_entityTypeId,
+                                'attribute_id=?' => (int)$attributeId,
+                                'store_id=?' => (int)$storeId,
                             ));
                         } else {
                             $tableData[] = array(
-                                'entity_id'      => $productId,
+                                'entity_id' => $productId,
                                 'entity_type_id' => $this->_entityTypeId,
-                                'attribute_id'   => $attributeId,
-                                'store_id'       => $storeId,
-                                'value'          => $storeValue
+                                'attribute_id' => $attributeId,
+                                'store_id' => $storeId,
+                                'value' => $storeValue
                             );
                         }
                     }
@@ -468,32 +509,34 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 $this->_connection->insertOnDuplicate($tableName, $tableData, array('value'));
             }
         }
+
         return $this;
     }
 
     /**
      * Check one attribute. Can be overridden in child.
      *
-     * @param string $attrCode Attribute code
-     * @param array $attrParams Attribute params
-     * @param array $rowData Row data
-     * @param int $rowNum
+     * @param string $attrCode   Attribute code
+     * @param array  $attrParams Attribute params
+     * @param array  $rowData    Row data
+     * @param int    $rowNum
+     *
      * @return boolean
      */
     public function isAttributeValid($attrCode, array $attrParams, array $rowData, $rowNum)
     {
-        if($rowData[$attrCode] == self::COBBY_DEFAULT)
+        if ($rowData[$attrCode] == self::COBBY_DEFAULT)
             return true;
 
         $message = '';
         switch ($attrParams['type']) {
             case 'varchar':
-                $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
+                $val = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_VARCHAR_LENGTH;
                 $message = 'String is too long, only ' . self::DB_MAX_VARCHAR_LENGTH . ' characters allowed.';
                 break;
             case 'decimal':
-                $val   = trim($rowData[$attrCode]);
+                $val = trim($rowData[$attrCode]);
                 $valid = (float)$val == $val;
                 $message = 'Decimal value expected.';
                 break;
@@ -503,18 +546,18 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 $message = 'Possible options are: ' . implode(', ', array_values($attrParams['options']));
                 break;
             case 'int':
-                $val   = trim($rowData[$attrCode]);
+                $val = trim($rowData[$attrCode]);
                 $valid = (int)$val == $val;
                 $message = 'Integer value expected.';
                 break;
             case 'datetime':
-                $val   = trim($rowData[$attrCode]);
+                $val = trim($rowData[$attrCode]);
                 $valid = strtotime($val) !== false
                     || preg_match('/^\d{2}.\d{2}.\d{2,4}(?:\s+\d{1,2}.\d{1,2}(?:.\d{1,2})?)?$/', $val);
                 $message = 'Datetime value expected.';
                 break;
             case 'text':
-                $val   = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
+                $val = Mage::helper('core/string')->cleanString($rowData[$attrCode]);
                 $valid = Mage::helper('core/string')->strlen($val) < self::DB_MAX_TEXT_LENGTH;
                 $message = 'String is too long, only ' . self::DB_MAX_TEXT_LENGTH . ' characters allowed.';
                 break;
@@ -525,20 +568,23 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
         if (!$valid) {
             $this->addRowError(Mage::helper('importexport')->__("Invalid value for '%s'") . '. ' . $message, $rowNum, $attrCode);
-        } elseif (!empty($attrParams['is_unique'])) {
+        } else if (!empty($attrParams['is_unique'])) {
             if (isset($this->_uniqueAttributes[$attrCode][$rowData[$attrCode]])) {
                 $this->addRowError(Mage::helper('importexport')->__("Duplicate Unique Attribute for '%s'"), $rowNum, $attrCode);
+
                 return false;
             }
             $this->_uniqueAttributes[$attrCode][$rowData[$attrCode]] = true;
         }
-        return (bool) $valid;
+
+        return (bool)$valid;
     }
 
     /**
      * Save product websites.
      *
      * @param array $websiteData
+     *
      * @return Mage_ImportExport_Model_Import_Entity_Product
      */
     protected function _saveProductWebsites(array $websiteData)
@@ -552,7 +598,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             $websitesData = array();
 
             foreach ($websiteData as $delSku => $websites) {
-                $productId      = $this->_newSku[$delSku]['entity_id'];
+                $productId = $this->_newSku[$delSku]['entity_id'];
 
                 foreach (array_keys($websites) as $websiteId) {
                     $websitesData[] = array(
@@ -565,6 +611,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 $this->_connection->insertOnDuplicate($tableName, $websitesData);
             }
         }
+
         return $this;
     }
 
@@ -581,9 +628,9 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
      */
     protected function _initSkus()
     {
-        if($this->_usedSkus) {
+        if ($this->_usedSkus) {
             $columns = array('entity_id', 'type_id', 'attribute_set_id', 'sku');
-            $productTable   = Mage::getSingleton('core/resource')->getTableName('catalog/product');
+            $productTable = Mage::getSingleton('core/resource')->getTableName('catalog/product');
             $select = $this->_connection->select()
                 ->from($productTable, $columns)
                 ->where('sku in (?)', $this->_usedSkus);
@@ -592,9 +639,9 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 $typeId = $info['type_id'];
                 $sku = $info['sku'];
                 $this->_oldSku[$sku] = array(
-                    'type_id'        => $typeId,
-                    'attr_set_id'    => $info['attribute_set_id'],
-                    'entity_id'      => $info['entity_id'],
+                    'type_id' => $typeId,
+                    'attr_set_id' => $info['attribute_set_id'],
+                    'entity_id' => $info['entity_id'],
                     'supported_type' => isset($this->_productTypeModels[$typeId])
                 );
             }
@@ -604,7 +651,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
         return $this;
     }
-    
+
     protected function _isProductCategoryValid(array $rowData, $rowNum)
     {
         //we don't import categories here, so return always true
