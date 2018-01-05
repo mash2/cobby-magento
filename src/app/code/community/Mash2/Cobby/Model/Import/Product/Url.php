@@ -36,6 +36,7 @@ class Mash2_Cobby_Model_Import_Product_Url extends Mash2_Cobby_Model_Import_Prod
     public function import($rows)
     {
         $attributesData = array();
+        $result = array();
 
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
@@ -57,7 +58,18 @@ class Mash2_Cobby_Model_Import_Product_Url extends Mash2_Cobby_Model_Import_Prod
 
         Mage::dispatchEvent('cobby_import_product_url_import_after', array( 'products' => $changedProductIds ));
 
-        return $attributesData;
+        foreach ($attributesData as $prodId => $stores) {
+            $urls = array();
+            foreach ($stores as $storeId => $urlKey) {
+                $urls[] = array("store_id" => $storeId, "url_key" => $urlKey);
+            }
+
+            $result[] = array(  "product_id" => $prodId,
+                                "urls" => $urls);
+        }
+
+
+        return $result;
     }
 
     private function prepareUrlAttributes($productId, $storeValues)
