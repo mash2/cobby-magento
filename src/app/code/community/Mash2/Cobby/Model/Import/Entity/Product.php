@@ -365,9 +365,6 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         $source = $this->_getSource();
         $rows = array();
 
-        /** @var Mage_Core_Helper_Data $coreHelper */
-        $coreHelper = Mage::helper("core");
-
         $source->rewind();
         $this->_dataSourceModel->cleanBunches();
 
@@ -375,7 +372,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
             if ($this->_errorsCount >= $this->_errorsLimit) { // errors limit check
                 return;
             }
-            $rowData = $coreHelper->unEscapeCSVData($source->current());
+            $rowData = $source->current();
 
             $this->_processedRowsCount++;
 
