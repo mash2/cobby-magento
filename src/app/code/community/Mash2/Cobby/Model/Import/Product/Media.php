@@ -221,6 +221,11 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                     }
 
                     $attribute = $this->_resource->getAttribute($key);
+
+                    if (!$attribute) {
+                        continue;
+                    }
+
                     $attrTable = $attribute->getBackend()->getTable();
                     $attrId = $attribute->getId();
                     $attributesData[$attrTable][$productId][$attrId][$storeId] = $file;
