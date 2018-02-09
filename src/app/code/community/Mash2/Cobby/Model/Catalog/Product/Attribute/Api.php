@@ -65,6 +65,13 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Api extends Mage_Catalog_Model
      */
     public function export($setId)
     {
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')
+            ->load($setId);
+
+        if(empty($attributeSet->getData())) {
+            $this->_fault('attribute_set_not_exists');
+        }
+
         $attributes = Mage::getModel('catalog/product')->getResource()
             ->loadAllAttributes()
             ->getSortedAttributes($setId);

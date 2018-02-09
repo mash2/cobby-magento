@@ -41,8 +41,12 @@
                 <faults module="catalog">
                     <attribute_not_exists>
                         <code>-32001</code>
-                        <message>Requested attribute not found.</message>
+                        <message>Requested attribute doesn't exist</message>
                     </attribute_not_exists>
+                    <attribute_set_not_exists>
+                        <code>-32002</code>
+                        <message>Requested attribute_set doesn't exist</message>
+                    </attribute_set_not_exists>
                 </faults>
             </cobby_catalog_product_attribute>
 
@@ -52,6 +56,12 @@
                     <import translate="title" module="mash2_cobby"/>
                     <export translate="title" module="mash2_cobby"/>
                 </methods>
+                <faults module="catalog">
+                    <attribute_not_exists>
+                        <code>-32001</code>
+                        <message>Requested attribute doesn't exist</message>
+                    </attribute_not_exists>
+                </faults>
             </cobby_catalog_product_attribute_option>
 
             <cobby_catalog_product_type_configurable>

@@ -7,6 +7,14 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Option_Api extends Mage_Catalo
 
     public function export($attributeId)
     {
+        $attribute = Mage::getModel('catalog/product')
+            ->getResource()
+            ->getAttribute($attributeId);
+
+        if (!$attribute) {
+            $this->_fault('attribute_not_exists');
+        }
+
         $result = $this->options($attributeId, null);
         $transportObject = new Varien_Object();
         $transportObject->setOptions($result);
