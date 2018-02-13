@@ -38,7 +38,9 @@ class Mash2_Cobby_Model_Catalog_Product_Api extends Mage_Catalog_Model_Product_A
 
     public function getAllIds($pageNum, $pageSize){
         $result = array();
-        
+
+        Mage::dispatchEvent('cobby_catalog_product_export_ids_before');
+
         $collection = Mage::getResourceModel('catalog/product_collection')
             ->setStoreId(Mage_Catalog_Model_Abstract::DEFAULT_STORE_ID)
             ->setPage($pageNum, $pageSize)
@@ -51,6 +53,8 @@ class Mash2_Cobby_Model_Catalog_Product_Api extends Mage_Catalog_Model_Product_A
                 'type_id' => $item->getTypeId()
             ); 
         }
+
+        Mage::dispatchEvent('cobby_catalog_product_export_ids_after');
 
         return $result;
     }

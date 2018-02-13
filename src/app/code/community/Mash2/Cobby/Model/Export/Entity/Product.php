@@ -190,7 +190,10 @@ class Mash2_Cobby_Model_Export_Entity_Product extends Varien_Object
         $this->_connection = Mage::getSingleton('core/resource')->getConnection('write');
         $filterChangedProducts = $this->filterChangedProducts($filterProductParams);
 
-		$unchangedProducts = array_diff_key($filterProductParams, $filterChangedProducts);
+        Mage::dispatchEvent('cobby_catalog_product_export_before', array('products' => $filterProductParams));
+
+
+        $unchangedProducts = array_diff_key($filterProductParams, $filterChangedProducts);
 		
 		foreach($unchangedProducts as $productId => $hash)
         {
