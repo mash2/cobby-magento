@@ -253,6 +253,7 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
     {
         $event = $observer->getEvent();
         $item = $event->getItem();
+        Mage::getModel('mash2_cobby/product')->updateHash($item->getProductId());
         $this->queueHelper
             ->enqueueAndNotify('stock', self::SAVE, $item->getProductId()); //constant has different value
     }
