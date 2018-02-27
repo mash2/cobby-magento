@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * Class Mash2_Cobby_Model_Import_Product_Media
+ */
 class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Product_Abstract
 {
     protected $_fileUploader;
 
     const ERROR_FILE_NOT_FOUND      = 1;
+    const ATTRIBUTE_CODES           = 'attribute_codes';
+    const ATTRIBUTE_IDS             = 'attribute_ids';
 
     private $_uploadMediaFiles = array();
 
@@ -48,6 +53,11 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     private $settings;
 
     /**
+     * @var
+     */
+    protected $_connection;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -63,6 +73,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
         $this->_htUser = $this->settings->getHtaccessUser();
         $this->_htPassword = $this->settings->getHtaccessPassword();
         $this->_mediaUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA);
+        $this->_connection = Mage::getSingleton('core/resource')->getConnection('write');
     }
 
     public function import($rows)
@@ -90,6 +101,99 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
         Mage::getModel('mash2_cobby/product')->updateHash($productIds);
 
         Mage::dispatchEvent('cobby_import_product_media_import_after', array( 'products' => $productIds ));
+
+        $attributes = $this->getAttributes($productIds);
+        $storedMediaGallery = $this->getMediaGallery($productIds, $this->getStoreIds());
+
+        foreach ($storedMediaGallery as $prodId => $media) {
+            $result[] = array(
+                'product_id' => $prodId,
+                Mash2_Cobby_Model_Export_Entity_Product::COL_IMAGE_GALLERY => $media,
+                Mash2_Cobby_Model_Export_Entity_Product::COL_ATTRIBUTES    => $attributes);
+        }
+
+        return $result;
+    }
+
+    private function getAttributes($productIds){
+        $result = array();
+        $attrCodes = $this->getImageAttributeData(self::ATTRIBUTE_CODES);
+
+        foreach ($this->getStoreIds() as $storeId) {
+            $attribute = array();
+            $collection = Mage::getResourceModel('mash2_cobby/catalog_product_collection');
+
+            foreach ($attrCodes as $attrCode) {
+                $collection->addAttributeToSelect($attrCode);
+            }
+
+            $collection->addAttributeToFilter('entity_id', array('in' => $productIds));
+            $collection->setStoreId($storeId);
+            $collection->load();
+
+            $attribute['store_id'] = $storeId;
+
+            foreach ($collection as $itemId => $item){
+                foreach ($attrCodes as $attrCode) {
+                    $attribute[$attrCode] = $item->getData($attrCode);
+                }
+            }
+
+            $result[] = $attribute;
+        }
+
+        return $result;
+    }
+
+    private function getMediaGallery(array $productIds, $storeIds)
+    {
+
+        if (empty($productIds)) {
+            return array();
+        }
+        $resource = Mage::getSingleton('core/resource');
+        $select = $this->_connection->select()
+            ->from(
+                array('mg' => $resource->getTableName('catalog/product_attribute_media_gallery')),
+                array(
+                    'mg.entity_id', 'mg.attribute_id', 'filename' => 'mg.value', 'mgv.label',
+                    'mgv.position', 'mgv.disabled', 'mgv.store_id'
+                )
+            )
+            ->joinLeft(
+                array('mgv' => $resource->getTableName('catalog/product_attribute_media_gallery_value')),
+                '(mg.value_id = mgv.value_id )',
+                array()
+            )
+            ->where('mg.entity_id IN(?)', $productIds);
+
+        $rowMediaGallery = array();
+        $stmt = $this->_connection->query($select);
+        while ($mediaRow = $stmt->fetch()) {
+            $productId = $mediaRow['entity_id'];
+            $storeId = isset($mediaRow['store_id']) ? (int)$mediaRow['store_id'] : 0;
+            if (in_array($storeId, $storeIds)) {
+                $rowMediaGallery[$productId][] = array(
+                    'store_id'      => $storeId,
+                    'attribute_id'  => $mediaRow['attribute_id'],
+                    'filename'      => $mediaRow['filename'],
+                    'label'         => $mediaRow['label'],
+                    'position'      => $mediaRow['position'],
+                    'disabled'      => $mediaRow['disabled'],
+                );
+            }
+        }
+
+        return $rowMediaGallery;
+    }
+
+    private function getStoreIds()
+    {
+        $result = array();
+        foreach (Mage::app()->getStores(true) as $store) {
+            $result[] = $store->getId();
+        }
+        ksort($result); // to ensure that 'admin' store (ID is zero) goes first
 
         return $result;
     }
@@ -456,7 +560,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     private function _getProductImages( $productId )
     {
         $mediaAttributesTableName = $this->_resource->getTable('catalog_product_entity_varchar');
-        $attributeIds = $this->getImageAttributeIds();
+        $attributeIds = $this->getImageAttributeData(self::ATTRIBUTE_IDS);
 
         $productImages = $this->connection->fetchPairs($this->connection->select()
             ->from($mediaAttributesTableName, array('value', 'value_id'))
@@ -591,7 +695,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
         return $result;
     }
 
-    public function getImageAttributeIds()
+    private function getImageAttributeData($request)
     {
         // @var $collection Mage_Catalog_Model_Resource_Eav_Mysql4_Product_Attribute_Collection /
         $collection = Mage::getResourceModel('catalog/product_attribute_collection');
@@ -601,7 +705,12 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
         $result = array();
 
         foreach ($collection as $attribute) {
-            $result[] = $attribute->getAttributeId();
+            if ($request == self::ATTRIBUTE_CODES) {
+                $result[] = $attribute->getAttributeCode();
+            }elseif ($request == self::ATTRIBUTE_IDS) {
+                $result[] = $attribute->getAttributeId();
+            }
+
         }
 
         return $result;

@@ -481,7 +481,7 @@ class Mash2_Cobby_Model_Export_Entity_Product extends Varien_Object
     /**
      * Prepare products media gallery
      *
-     * @param int $storeId
+     * @param int $storeIds
      * @param  array $productIds
      * @return array
      */
