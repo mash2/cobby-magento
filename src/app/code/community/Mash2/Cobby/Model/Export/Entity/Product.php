@@ -301,7 +301,7 @@ class Mash2_Cobby_Model_Export_Entity_Product extends Varien_Object
             }
         }
 
-        $productIds = array_keys($dataRows);
+        $productIds = array_keys($filterChangedProducts);
 
         $configurableProductsCollection = Mage::getResourceModel('catalog/product_collection');
         $configurableProductsCollection->addAttributeToFilter( 'entity_id', array( 'in' => $productIds ))
