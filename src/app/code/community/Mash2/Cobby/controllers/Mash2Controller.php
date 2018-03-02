@@ -91,16 +91,14 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
     {
         $filePath = $this->getRequest()->getParam('filename');
         $prefixPath = '/var/www/html';
-        $fullPath = $prefixPath . $filePath;
-        if ($fullPath){
-            $image = file_get_contents($fullPath);
-//            $im  = @imagecreatefromjpeg($fullPath);
-            header('Content-Type : image/jpeg');
-//            imagejpeg($im);
-//            imagedestroy($im);
-//            echo $image;
-            imagejpeg($image);
-        }
+
+        $file = $prefixPath . $filePath;;
+        $type = 'image/jpeg';
+        header('Content-Type:'.$type);
+        header('Content-Length: ' . filesize($file));
+        readfile($file);
+
+
     }
 
     public function getGalleryImagesAction(){
