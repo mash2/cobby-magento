@@ -87,12 +87,20 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         return Mage::getSingleton('catalog/product_media_config');
     }
 
-    public function getImage()
+    public function getImageAction()
     {
-        $image = file_get_contents($this->getRequest()->getParam('filename'));
-        header('content-type : image/gif');
-
-        echo $image;
+        $filePath = $this->getRequest()->getParam('filename');
+        $prefixPath = '/var/www/html';
+        $fullPath = $prefixPath . $filePath;
+        if ($fullPath){
+            $image = file_get_contents($fullPath);
+//            $im  = @imagecreatefromjpeg($fullPath);
+            header('Content-Type : image/jpeg');
+//            imagejpeg($im);
+//            imagedestroy($im);
+//            echo $image;
+            imagejpeg($image);
+        }
     }
 
     public function getGalleryImagesAction(){
@@ -100,7 +108,6 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $result = array();
         $id = $this->getRequest()->getParam('id');
         $type = $this->getRequest()->getParam('type');
-        $filename = $this->getRequest()->getParam('filename');
 
         if($id)
         {
@@ -108,11 +115,6 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
             foreach ($product->getMediaGallery('images') as $image) {
                 if($type)
                     $result[] = Mage::helper('catalog/image')->init($product, $type, $image['file']);
-                else if ($filename) {
-                    $image = file_get_contents($filename);
-                    header('content-type : image/gif');
-                    echo $image;
-                }
                 else
                     $result[] = $this->getMediaConfig()->getMediaUrl($image['file']);
             }
