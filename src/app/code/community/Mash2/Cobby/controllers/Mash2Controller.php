@@ -91,14 +91,55 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
     {
         $filePath = $this->getRequest()->getParam('filename');
         $prefixPath = '/var/www/html';
-
         $file = $prefixPath . $filePath;;
         $type = 'image/jpeg';
-        header('Content-Type:'.$type);
-        header('Content-Length: ' . filesize($file));
-        readfile($file);
+
+//        header('Content-Type:'.$type);
+//        header('Content-Length: ' . filesize($file));
+//        readfile($file);
 
 
+        $this->getResponse()
+            ->setHttpResponseCode(200)
+            ->setHeader('Pragma', 'public', true)
+            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
+            ->setHeader('Content-type', $type, true)
+//            ->setHeader('Content-Length', filesize($file), true)
+            ->setHeader('Content-Disposition', 'attachment; filename="'.$file.'"', true)
+            ->setHeader('Last-Modified', date('r'), true);
+
+//        if (!is_null($content)) {
+//            if ($isFile) {
+                $this->getResponse()->clearBody();
+                $this->getResponse()->sendHeaders();
+
+                $ioAdapter = new Varien_Io_File();
+                $ioAdapter->open(array('path' => $ioAdapter->dirname($file)));
+                $ioAdapter->streamOpen($file, 'r');
+                while ($buffer = $ioAdapter->streamRead()) {
+                    print $buffer;
+                }
+                $ioAdapter->streamClose();
+//                if (!empty($content['rm'])) {
+//                    $ioAdapter->rm($file);
+//                }
+
+//                exit(0);
+//            } else {
+//                $this->getResponse()->setBody($content);
+//            }
+//        }
+
+//        $response = $this->getResponse();
+//        $response->clearAllHeaders();
+//        $response->setHeader('Content-Type', $type);
+//        $response->setHeader('Content-Length', filesize($file));
+//
+//        $image = @ImageCreateFromJpeg($file);
+////        $response->setBody(imagejpeg($image));
+//
+//        imagejpeg($file);
+////        $response->sendResponse();
     }
 
     public function getGalleryImagesAction(){
