@@ -87,12 +87,34 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         return Mage::getSingleton('catalog/product_media_config');
     }
 
+    private function getMediaDir()
+    {
+        $dir = Mage::getBaseDir('media');
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+        return $dir;
+    }
+
     public function getImageAction()
     {
-        $filePath = $this->getRequest()->getParam('filename');
+        $fileName = $this->getRequest()->getParam('filename');
+//        $filePath = $this->getRequest()->getParam('filename');
         $prefixPath = '/var/www/html';
-        $file = $prefixPath . $filePath;;
+//        $file = $prefixPath . $filePath;
+
         $type = 'image/jpeg';
+
+        $mediaDir = $this->getMediaDir();
+        $importDir = $mediaDir . DS . 'import';
+        $catProdDir = $mediaDir . DS . 'catalog/product';
+
+        if (!is_file($catProdDir . $fileName)) {
+            if (!is_file($importDir . $fileName)) {
+                return "no file";
+            }
+
+        }
 
 //        header('Content-Type:'.$type);
 //        header('Content-Length: ' . filesize($file));
@@ -101,12 +123,12 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 
         $this->getResponse()
             ->setHttpResponseCode(200)
-            ->setHeader('Pragma', 'public', true)
-            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
-            ->setHeader('Content-type', $type, true)
+//            ->setHeader('Pragma', 'public', true)
+//            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
+            ->setHeader('Content-type', $type, true);
 //            ->setHeader('Content-Length', filesize($file), true)
-            ->setHeader('Content-Disposition', 'attachment; filename="'.$file.'"', true)
-            ->setHeader('Last-Modified', date('r'), true);
+//            ->setHeader('Content-Disposition', 'attachment; filename="'.$file.'"', true)
+//            ->setHeader('Last-Modified', date('r'), true);
 
 //        if (!is_null($content)) {
 //            if ($isFile) {
