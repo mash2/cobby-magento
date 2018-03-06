@@ -45,13 +45,12 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $session = Mage::getSingleton('mash2_cobby/admin_session');
         $auth = $session->login($username, $password);
         $result = '';
-        if($auth->getId()){
+        if ($auth->getId()) {
             $result = $session->getSessionId();
         }
 
-        if(!empty($result))
-        {
-            $result = $result . ';' . $session->getUser()->getId(). ';' . $session->getUser()->getRole()->getId();
+        if (!empty($result)) {
+            $result = $result . ';' . $session->getUser()->getId() . ';' . $session->getUser()->getRole()->getId();
         }
 
         echo $result;
@@ -63,16 +62,13 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $roleId = $this->getRequest()->getPost('roleid');
         $session = Mage::getSingleton('admin/session');
 
-        if(
+        if (
             $session->isLoggedIn()
-            && strtolower($session->getUser()-> getUsername()) == strtolower($username)
+            && strtolower($session->getUser()->getUsername()) == strtolower($username)
             && $roleId == $session->getUser()->getRole()->getId()
-        )
-        {
+        ) {
             echo 'true';
-        }
-        else
-        {
+        } else {
             echo 'false';
         }
     }
@@ -87,17 +83,19 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         return Mage::getSingleton('catalog/product_media_config');
     }
 
-    private function getMediaDir()
+    private function getMediaDir($ioAdapter)
     {
         $dir = Mage::getBaseDir('media');
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
+//        if (!is_dir($dir)) {
+//            mkdir($dir);
+//        }
+        $ioAdapter->checkAndCreateFolder($dir);
         return $dir;
     }
 
     public function getImageAction()
     {
+        $ioAdapter = new Varien_Io_File();
         $fileName = $this->getRequest()->getParam('filename');
 //        $filePath = $this->getRequest()->getParam('filename');
         $prefixPath = '/var/www/html';
@@ -105,22 +103,37 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 
         $type = 'image/jpeg';
 
-        $mediaDir = $this->getMediaDir();
+//        $mediaDir = $this->getMediaDir($ioAdapter);
+        $mediaDir = $ioAdapter->checkAndCreateFolder(Mage::getBaseDir('media'));
         $importDir = $mediaDir . DS . 'import';
         $catProdDir = $mediaDir . DS . 'catalog/product';
 
-        if (!is_file($catProdDir . $fileName)) {
-            if (!is_file($importDir . $fileName)) {
-                return "no file";
-            }
+//        if (!is_file($catProdDir . $fileName)) {
+//            if (!is_file($importDir . $fileName)) {
+//                return "no file";
+//            }  else {
+//                $file = $importDir . $fileName;
+//            }
+//
+//        } else {
+//            $file = $catProdDir . $fileName;
+//        }
 
+        if (!$ioAdapter->fileExists($catProdDir . $fileName)) {
+            if (!$ioAdapter->fileExists($importDir . $fileName)) {
+                return "no file";
+            } else {
+                $file = $importDir . $fileName;
+            }
+        } else {
+            $file = $catProdDir . $fileName;
         }
 
 //        header('Content-Type:'.$type);
 //        header('Content-Length: ' . filesize($file));
 //        readfile($file);
 
-
+//        $ioAdapter = new Varien_Io_File();
         $this->getResponse()
             ->setHttpResponseCode(200)
 //            ->setHeader('Pragma', 'public', true)
@@ -132,16 +145,16 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 
 //        if (!is_null($content)) {
 //            if ($isFile) {
-                $this->getResponse()->clearBody();
-                $this->getResponse()->sendHeaders();
+        $this->getResponse()->clearBody();
+        $this->getResponse()->sendHeaders();
 
-                $ioAdapter = new Varien_Io_File();
-                $ioAdapter->open(array('path' => $ioAdapter->dirname($file)));
-                $ioAdapter->streamOpen($file, 'r');
-                while ($buffer = $ioAdapter->streamRead()) {
-                    print $buffer;
-                }
-                $ioAdapter->streamClose();
+
+        $ioAdapter->open(array('path' => $ioAdapter->dirname($file)));
+        $ioAdapter->streamOpen($file, 'r');
+        while ($buffer = $ioAdapter->streamRead()) {
+            print $buffer;
+        }
+        $ioAdapter->streamClose();
 //                if (!empty($content['rm'])) {
 //                    $ioAdapter->rm($file);
 //                }
@@ -164,17 +177,17 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 ////        $response->sendResponse();
     }
 
-    public function getGalleryImagesAction(){
+    public function getGalleryImagesAction()
+    {
 
         $result = array();
         $id = $this->getRequest()->getParam('id');
         $type = $this->getRequest()->getParam('type');
 
-        if($id)
-        {
+        if ($id) {
             $product = Mage::getModel('catalog/product')->load($id);
             foreach ($product->getMediaGallery('images') as $image) {
-                if($type)
+                if ($type)
                     $result[] = Mage::helper('catalog/image')->init($product, $type, $image['file']);
                 else
                     $result[] = $this->getMediaConfig()->getMediaUrl($image['file']);
