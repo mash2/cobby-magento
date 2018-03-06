@@ -1,5 +1,5 @@
 <?php
-abstract class Mash2_Cobby_Model_Import_Product_Abstract extends Mage_Core_Model_Abstract
+abstract class Mash2_Cobby_Model_Import_Product_Abstract extends Mage_Api_Model_Resource_Abstract
 {
     /**
      * @var Mage_Core_Model_Resource
