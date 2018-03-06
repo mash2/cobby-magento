@@ -97,16 +97,37 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
     {
         $ioAdapter = new Varien_Io_File();
         $fileName = $this->getRequest()->getParam('filename');
+        $id = $this->getRequest()->getParam('id');
+        $type = 'thumbnail';
+
+        $product = Mage::getModel('catalog/product')->load($id);
+        foreach ($product->getMediaGallery('images') as $image) {
+            $tokens = explode('/', $image['file']);
+            $str = trim(end($tokens));
+            if ($str == $fileName){
+                $file = Mage::helper('catalog/image')->init($product, $type, $image['file']);
+                $filePath = $image['file'];
+            }
+        }
+
+
+//        $type = $this->getRequest()->getParam('type');
+
 //        $filePath = $this->getRequest()->getParam('filename');
-        $prefixPath = '/var/www/html';
+//        $prefixPath = '/var/www/html';
 //        $file = $prefixPath . $filePath;
 
-        $type = 'image/jpeg';
+        $contentType = 'image/jpeg';
 
 //        $mediaDir = $this->getMediaDir($ioAdapter);
-        $mediaDir = $ioAdapter->checkAndCreateFolder(Mage::getBaseDir('media'));
-        $importDir = $mediaDir . DS . 'import';
-        $catProdDir = $mediaDir . DS . 'catalog/product';
+//        if ($ioAdapter->checkAndCreateFolder(Mage::getBaseDir('media'))) {
+//            $mediaDir = Mage::getBaseDir('media');
+//        } else {
+//            echo 'no media folder';
+//        }
+
+//        $importDir = $mediaDir . DS . 'import';
+//        $catProdDir = $mediaDir . DS . 'catalog/product';
 
 //        if (!is_file($catProdDir . $fileName)) {
 //            if (!is_file($importDir . $fileName)) {
@@ -119,15 +140,24 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 //            $file = $catProdDir . $fileName;
 //        }
 
-        if (!$ioAdapter->fileExists($catProdDir . $fileName)) {
-            if (!$ioAdapter->fileExists($importDir . $fileName)) {
-                return "no file";
-            } else {
-                $file = $importDir . $fileName;
-            }
-        } else {
-            $file = $catProdDir . $fileName;
-        }
+//        if (!$ioAdapter->fileExists($catProdDir . DS .$fileName)) {
+//            if (!$ioAdapter->fileExists($importDir . DS . $fileName)) {
+//                return "no file";
+//            } else {
+//                $file = $importDir . DS . $fileName;
+//            }
+//        } else {
+//            $file = $catProdDir . DS . $fileName;
+//        }
+
+//        if ($id) {
+//            $product = Mage::getModel('catalog/product')->load($id);
+//            if ($type)
+//            foreach ($product->getMediaGallery('images') as $image) {
+//                $newFile = Mage::helper('catalog/image')->init($product, $type, $image['file']);
+//            }
+//        }
+
 
 //        header('Content-Type:'.$type);
 //        header('Content-Length: ' . filesize($file));
@@ -138,7 +168,7 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
             ->setHttpResponseCode(200)
 //            ->setHeader('Pragma', 'public', true)
 //            ->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true)
-            ->setHeader('Content-type', $type, true);
+            ->setHeader('Content-type', $contentType, true);
 //            ->setHeader('Content-Length', filesize($file), true)
 //            ->setHeader('Content-Disposition', 'attachment; filename="'.$file.'"', true)
 //            ->setHeader('Last-Modified', date('r'), true);
@@ -149,8 +179,8 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $this->getResponse()->sendHeaders();
 
 
-        $ioAdapter->open(array('path' => $ioAdapter->dirname($file)));
-        $ioAdapter->streamOpen($file, 'r');
+        $ioAdapter->open(array('path' => $ioAdapter->dirname($filePath)));
+        $ioAdapter->streamOpen($filePath, 'r');
         while ($buffer = $ioAdapter->streamRead()) {
             print $buffer;
         }
