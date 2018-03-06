@@ -348,6 +348,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                 $image = $imageData['image'];
                 $downloadedImage = false;
                 $externalImage = false;
+                $importError = false;
 
                 if (!empty($imageData['import'])) {
                     if (empty($imageData['name'])) {
@@ -358,7 +359,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                         $this->_imageHelper->validateUploadFile($this->importDir . DS . $imageData['import']);
                         copy($this->importDir . DS . $imageData['import'], $this->importDir . DS . $imageData['name']);
                     } catch (Exception $e) {
-                        $mediaGallery[$productId]['errors'][$imageData['image']] = self::ERROR_FILE_NOT_FOUND;
+                        $importError = true;
                     }
                 } else if (!empty($imageData['upload'])) {
                     $externalImage = true;
@@ -381,13 +382,17 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                         $this->_imageHelper->validateUploadFile($filename);
                     } catch (Exception $e) {
                         if ($externalImage && !$downloadedImage) {
-                            $mediaGallery[$productId]['errors'][$imageData['image']] = self::ERROR_FILE_NOT_DOWNLOADED;
-                        } else {
-                            $mediaGallery[$productId]['errors'][$imageData['image']] = self::ERROR_FILE_NOT_FOUND;
+                            $mediaGallery[$productId]['errors'][] = array(
+                                'image' => $imageData['image'],
+                                'file' => $imageData['upload'],
+                                'error_code' => self::ERROR_FILE_NOT_DOWNLOADED);
+                        } else if ($importError) {
+                            $mediaGallery[$productId]['errors'][] = array(
+                                'image' => $imageData['image'],
+                                'file' => $imageData['import'],
+                                'error_code' => self::ERROR_FILE_NOT_FOUND);
                         }
                     }
-
-
                 }
 
                 if (!isset($mediaGallery[$productId]['errors'][$imageData['image']])) {
