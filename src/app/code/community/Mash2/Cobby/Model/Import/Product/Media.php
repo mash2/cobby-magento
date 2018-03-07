@@ -121,18 +121,11 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                 $storedMediaGallery[$prodId] = array();
             }
 
-            $errors = array();
-            foreach ($value['errors'] as $image => $errorCode) {
-                $errors[] = array(
-                    'image' => $image,
-                    'error_code' => $errorCode);
-            }
-
             $result[] = array(
                 'product_id' => $prodId,
                 Mash2_Cobby_Model_Export_Entity_Product::COL_IMAGE_GALLERY => $storedMediaGallery[$prodId],
                 Mash2_Cobby_Model_Export_Entity_Product::COL_ATTRIBUTES => $attributes,
-                'errors' => $errors);
+                'errors' => $value['errors']);
         }
 
         return $result;
