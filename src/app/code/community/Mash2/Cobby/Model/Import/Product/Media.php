@@ -471,6 +471,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
         if (!$this->_fileUploader->setTmpDir($this->importDir)) {
             try {
                 $this->_fileHelper->checkAndCreateFolder($this->importDir);
+                $this->_fileUploader->setTmpDir($this->importDir);
             } catch (Exception $e) {
                 Mage::throwException("File directory '{$this->importDir}' is not readable.");
             }
