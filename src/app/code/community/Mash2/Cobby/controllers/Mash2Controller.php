@@ -110,6 +110,9 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
             }
         }
 
+        $test = (string)$file;
+        $tokens = explode('/', $test);
+        $str = trim(end($tokens));
 
 //        $type = $this->getRequest()->getParam('type');
 
@@ -179,8 +182,8 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $this->getResponse()->sendHeaders();
 
 
-        $ioAdapter->open(array('path' => $ioAdapter->dirname($filePath)));
-        $ioAdapter->streamOpen($filePath, 'r');
+        $ioAdapter->open(array('path' => $ioAdapter->dirname($test)));
+        $ioAdapter->streamOpen($test, 'r');
         while ($buffer = $ioAdapter->streamRead()) {
             print $buffer;
         }
