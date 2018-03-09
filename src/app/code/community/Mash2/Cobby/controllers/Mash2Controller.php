@@ -83,108 +83,50 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         return Mage::getSingleton('catalog/product_media_config');
     }
 
-    private function getMediaDir($ioAdapter)
+    private function getImagePath($id, $filename)
     {
-        $dir = Mage::getBaseDir('media');
-//        if (!is_dir($dir)) {
-//            mkdir($dir);
-//        }
-        $ioAdapter->checkAndCreateFolder($dir);
-        return $dir;
+        $baseMediaUrl = Mage::getBaseUrl('media');
+        $baseMediaDir = Mage::getBaseDir('media') . DS;
+
+        if ((int)$id){
+            $product = Mage::getModel('catalog/product')->load($id);
+            if ($product->getId()) {
+                foreach ($product->getMediaGallery('images') as $image) {
+                    $tokens = explode('/', $image['file']);
+                    $str = trim(end($tokens));
+                    if ($str == $filename){
+                        $file = Mage::helper('catalog/image')->init($product, 'thumbnail', $image['file']);
+                        $fileString = (string)$file;
+                        $filePath = str_replace($baseMediaUrl, $baseMediaDir, $fileString);
+
+                        return $filePath;
+                    }
+                }
+            }
+        } else if (file_exists($baseMediaDir . 'import/'. $filename)) {
+            $filePath = $baseMediaDir . 'import/' . $filename;
+
+            return $filePath;
+        }
+
+        $placeholder = Mage::getDesign()->getSkinUrl('images/catalog/product/placeholder/thumbnail.jpg');
+        $baseSkinUrl = Mage::getBaseUrl('skin');
+        $baseSkinDir = Mage::getBaseDir() . DS . 'skin' . DS;
+        $filePath = str_replace($baseSkinUrl, $baseSkinDir, $placeholder);
+
+        return $filePath;
     }
 
     public function getImageAction()
     {
         $ioAdapter = new Varien_Io_File();
-        $baseUrl = Mage::getBaseUrl('media');
-        $baseDir = Mage::getBaseDir('media') . DS;
+
         $fileName = $this->getRequest()->getParam('filename');
         $id = $this->getRequest()->getParam('id');
-        $type = 'thumbnail';
-        $filePath = '';
 
-        $product = Mage::getModel('catalog/product')->load($id);
-        if ($product->getEntityId()) {
-            foreach ($product->getMediaGallery('images') as $image) {
-                $tokens = explode('/', $image['file']);
-                $str = trim(end($tokens));
-                if ($str == $fileName){
-                    $file = Mage::helper('catalog/image')->init($product, $type, $image['file']);
-                    $fileString = (string)$file;
-                    $filePath = str_replace($baseUrl, $baseDir, $fileString);
-
-                }
-            }
-        } else if (file_exists($baseDir . 'import/'. $fileName)) {
-            $filePath = $baseDir . 'import/' . $fileName;
-        } else {
-            $placeholder = Mage::getDesign()->getSkinUrl('images/no_image.jpg');
-            $baseUrl = Mage::getBaseUrl('skin');
-            $baseDir = Mage::getBaseDir() . DS . 'skin/';
-            //not basDir media
-            $filePath = str_replace($baseUrl, $baseDir, $placeholder);
-            $test = Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
-        }
-
-
-
-//        header('Content-Type:image/jpeg');
-//        readfile($filePath);
-//        return;
-
-//        $type = $this->getRequest()->getParam('type');
-
-//        $filePath = $this->getRequest()->getParam('filename');
-//        $prefixPath = '/var/www/html';
-//        $file = $prefixPath . $filePath;
+        $filePath = $this->getImagePath($id, $fileName);
 
         $contentType = 'image/jpeg';
-
-//        $mediaDir = $this->getMediaDir($ioAdapter);
-//        if ($ioAdapter->checkAndCreateFolder(Mage::getBaseDir('media'))) {
-//            $mediaDir = Mage::getBaseDir('media');
-//        } else {
-//            echo 'no media folder';
-//        }
-
-//        $importDir = $mediaDir . DS . 'import';
-//        $catProdDir = $mediaDir . DS . 'catalog/product';
-
-//        if (!is_file($catProdDir . $fileName)) {
-//            if (!is_file($importDir . $fileName)) {
-//                return "no file";
-//            }  else {
-//                $file = $importDir . $fileName;
-//            }
-//
-//        } else {
-//            $file = $catProdDir . $fileName;
-//        }
-
-//        if (!$ioAdapter->fileExists($catProdDir . DS .$fileName)) {
-//            if (!$ioAdapter->fileExists($importDir . DS . $fileName)) {
-//                return "no file";
-//            } else {
-//                $file = $importDir . DS . $fileName;
-//            }
-//        } else {
-//            $file = $catProdDir . DS . $fileName;
-//        }
-
-//        if ($id) {
-//            $product = Mage::getModel('catalog/product')->load($id);
-//            if ($type)
-//            foreach ($product->getMediaGallery('images') as $image) {
-//                $newFile = Mage::helper('catalog/image')->init($product, $type, $image['file']);
-//            }
-//        }
-
-
-//        header('Content-Type:'.$type);
-//        header('Content-Length: ' . filesize($file));
-//        readfile($file);
-
-//        $ioAdapter = new Varien_Io_File();
         $this->getResponse()
             ->setHttpResponseCode(200)
 //            ->setHeader('Pragma', 'public', true)
@@ -194,11 +136,8 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
 //            ->setHeader('Content-Disposition', 'attachment; filename="'.$file.'"', true)
 //            ->setHeader('Last-Modified', date('r'), true);
 
-//        if (!is_null($content)) {
-//            if ($isFile) {
         $this->getResponse()->clearBody();
         $this->getResponse()->sendHeaders();
-
 
         $ioAdapter->open(array('path' => $ioAdapter->dirname($filePath)));
         $ioAdapter->streamOpen($filePath, 'r');
@@ -206,26 +145,6 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
             print $buffer;
         }
         $ioAdapter->streamClose();
-//                if (!empty($content['rm'])) {
-//                    $ioAdapter->rm($file);
-//                }
-
-//                exit(0);
-//            } else {
-//                $this->getResponse()->setBody($content);
-//            }
-//        }
-
-//        $response = $this->getResponse();
-//        $response->clearAllHeaders();
-//        $response->setHeader('Content-Type', $type);
-//        $response->setHeader('Content-Length', filesize($file));
-//
-//        $image = @ImageCreateFromJpeg($file);
-////        $response->setBody(imagejpeg($image));
-//
-//        imagejpeg($file);
-////        $response->sendResponse();
     }
 
     public function getGalleryImagesAction()
