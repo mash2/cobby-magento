@@ -279,6 +279,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
                     try {
                         $this->_imageHelper->validateUploadFile($filename);
+                        $mediaGallery[$productId]['images'][$imageData['image']] = $imageData['file'];
                     } catch (Exception $e) {
                         if ($externalImage && !$downloadedImage) {
                             $mediaGallery[$productId]['errors'][] = array(
@@ -293,11 +294,9 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                         }
                     }
                 }
-
-                if (!isset($mediaGallery[$productId]['errors'][$imageData['image']])) {
-                    $mediaGallery[$productId]['images'][$imageData['image']] = $imageData['file'];
-                }
             }
+
+            $errors = array_column($mediaGallery[$productId]['errors'], 'image');
 
             foreach ($gallery as $storeId => $storeGalleryData) {
                 if (!in_array($storeId, $storeIds))
@@ -305,7 +304,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
                 $mediaGallery[$productId]['gallery'][$storeId] = array();
                 foreach ($storeGalleryData as $galleryData) {
-                    if (!isset($mediaGallery[$productId]['errors'][$galleryData['image']])) {
+                    if (!in_array($galleryData['image'], $errors)) {
                         $mediaGallery[$productId]['gallery'][$storeId][] = array(
                             'image' => $galleryData['image'],
                             'disabled' => $galleryData['disabled'],
@@ -323,9 +322,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
                 $mediaGallery[$productId]['attributes'][$storeId] = array();
                 foreach ($storeAttributeData as $imageAttribute => $image) {
-
-                    if (!isset($mediaGallery[$productId]['errors'][$image])) {
-
+                    if (!in_array($image, $errors)) {
                         if (in_array($storeId, $useDefaultStores))
                             $image = '';
 
