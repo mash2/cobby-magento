@@ -96,23 +96,41 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
     public function getImageAction()
     {
         $ioAdapter = new Varien_Io_File();
+        $baseUrl = Mage::getBaseUrl('media');
+        $baseDir = Mage::getBaseDir('media') . DS;
         $fileName = $this->getRequest()->getParam('filename');
         $id = $this->getRequest()->getParam('id');
         $type = 'thumbnail';
+        $filePath = '';
 
         $product = Mage::getModel('catalog/product')->load($id);
-        foreach ($product->getMediaGallery('images') as $image) {
-            $tokens = explode('/', $image['file']);
-            $str = trim(end($tokens));
-            if ($str == $fileName){
-                $file = Mage::helper('catalog/image')->init($product, $type, $image['file']);
-                $filePath = $image['file'];
+        if ($product->getEntityId()) {
+            foreach ($product->getMediaGallery('images') as $image) {
+                $tokens = explode('/', $image['file']);
+                $str = trim(end($tokens));
+                if ($str == $fileName){
+                    $file = Mage::helper('catalog/image')->init($product, $type, $image['file']);
+                    $fileString = (string)$file;
+                    $filePath = str_replace($baseUrl, $baseDir, $fileString);
+
+                }
             }
+        } else if (file_exists($baseDir . 'import/'. $fileName)) {
+            $filePath = $baseDir . 'import/' . $fileName;
+        } else {
+            $placeholder = Mage::getDesign()->getSkinUrl('images/no_image.jpg');
+            $baseUrl = Mage::getBaseUrl('skin');
+            $baseDir = Mage::getBaseDir() . DS . 'skin/';
+            //not basDir media
+            $filePath = str_replace($baseUrl, $baseDir, $placeholder);
+            $test = Mage::getSingleton('catalog/product_media_config')->getBaseMediaUrl(). '/placeholder/' .Mage::getStoreConfig("catalog/placeholder/small_image_placeholder");
         }
 
-        $test = (string)$file;
-        $tokens = explode('/', $test);
-        $str = trim(end($tokens));
+
+
+//        header('Content-Type:image/jpeg');
+//        readfile($filePath);
+//        return;
 
 //        $type = $this->getRequest()->getParam('type');
 
@@ -182,8 +200,8 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $this->getResponse()->sendHeaders();
 
 
-        $ioAdapter->open(array('path' => $ioAdapter->dirname($test)));
-        $ioAdapter->streamOpen($test, 'r');
+        $ioAdapter->open(array('path' => $ioAdapter->dirname($filePath)));
+        $ioAdapter->streamOpen($filePath, 'r');
         while ($buffer = $ioAdapter->streamRead()) {
             print $buffer;
         }
