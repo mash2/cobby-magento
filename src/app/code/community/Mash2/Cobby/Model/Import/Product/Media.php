@@ -221,7 +221,6 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
-
         $storeIds = array();
         foreach (Mage::app()->getStores(true) as $store) {
             $storeIds[] = (int)$store->getId();
@@ -248,6 +247,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                 $downloadedImage = false;
                 $externalImage = false;
                 $importError = false;
+                $errArr = array();
 
                 if (!empty($imageData['import'])) {
                     if (empty($imageData['name'])) {
@@ -279,20 +279,26 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
                     try {
                         $this->_imageHelper->validateUploadFile($filename);
-                        $mediaGallery[$productId]['images'][$imageData['image']] = $imageData['file'];
+
                     } catch (Exception $e) {
                         if ($externalImage && !$downloadedImage) {
                             $mediaGallery[$productId]['errors'][] = array(
                                 'image' => $imageData['image'],
                                 'file' => $imageData['upload'],
                                 'error_code' => self::ERROR_FILE_NOT_DOWNLOADED);
+                            $errArr['errors'][$imageData['image']] = self::ERROR_FILE_NOT_DOWNLOADED;
                         } else if ($importError) {
                             $mediaGallery[$productId]['errors'][] = array(
                                 'image' => $imageData['image'],
                                 'file' => $imageData['import'],
                                 'error_code' => self::ERROR_FILE_NOT_FOUND);
+                            $errArr['errors'][$imageData['image']] = self::ERROR_FILE_NOT_FOUND;
                         }
                     }
+                }
+
+                if (!isset($errArr['errors'][$imageData['image']])){
+                    $mediaGallery[$productId]['images'][$imageData['image']] = $imageData['file'];
                 }
             }
 
