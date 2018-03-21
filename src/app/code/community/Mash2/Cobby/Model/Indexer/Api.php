@@ -179,6 +179,15 @@ class Mash2_Cobby_Model_Indexer_Api
         $result = array();
         $collection = $this->_getIndexer()->getProcessesCollection();
         foreach ($collection as $process) {
+            if(
+                ($process->getIndexerCode() == 'catalog_product_flat' &&
+                !Mage::helper('catalog/product_flat')->isEnabled()) ||
+                ($process->getIndexerCode() == 'catalog_category_flat' &&
+                !Mage::helper('catalog/category_flat')->isEnabled())
+            ) {
+                continue;
+            }
+
             $result[] = array(
                 'code' => $process->getIndexerCode(),
                 'indexer_type' => $process->getIndexerType(),
