@@ -125,6 +125,13 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
 
         $this->queueHelper
             ->enqueueAndNotify('category', self::SAVE, $category->getId()); //constant has different value
+
+        $affectedProductIds = $category->getAffectedProductIds();
+        if ($affectedProductIds) {
+            Mage::getModel('mash2_cobby/product')->updateHash($affectedProductIds);
+            $this->queueHelper
+                ->enqueueAndNotify('product', self::SAVE, $affectedProductIds);
+        }
     }
 
     public function catalogProductSaveAfter($observer)
