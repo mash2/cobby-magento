@@ -476,14 +476,14 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                 $this->_fileHelper->checkAndCreateFolder($this->importDir);
                 $this->_fileUploader->setTmpDir($this->importDir);
             } catch (Exception $e) {
-                Mage::throwException("File directory '{$this->importDir}' is not readable.");
+                Mage::throwException("cobby: File directory '{$this->importDir}' is not readable.");
             }
         }
         if (!$this->_fileHelper->isWriteable($this->importDir)) {
-            Mage::throwException("File directory '{$this->importDir}' is not writable.");
+            Mage::throwException("cobby: File directory '{$this->importDir}' is not writable.");
         }
         if (!$this->_fileUploader->setDestDir($destDir)) {
-            Mage::throwException("File directory '{$destDir}' is not writable.");
+            Mage::throwException("cobby: File directory '{$destDir}' is not writable.");
         }
     }
 
