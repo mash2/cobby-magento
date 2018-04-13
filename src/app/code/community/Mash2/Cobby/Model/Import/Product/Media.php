@@ -447,8 +447,13 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
                     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
                 }
                 curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
                 fclose($fileHandle);
+
+                if ($http_code !== 200) {
+                    Mage::throwException("Http code: " .$http_code);
+                }
 
                 $this->_imageHelper->validateUploadFile($this->importDir . DS . $fileName);
 
