@@ -34,17 +34,23 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
      * @param $entity
      * @param $action
      * @param $ids
+     * @param $transactionId
      * @return array
      */
-    private function enqueue($entity, $action, $ids)
+    private function enqueue($entity, $action, $ids, $transactionId)
     {
         $result = array();
+        if (!isset($transactionId)){
+            $transactionId = Mage::helper('core')->getRandomString(30);
+        }
+
         $batches = $this->splitObjectIds($ids);
         foreach ($batches as $batch) {
             $queue = Mage::getModel('mash2_cobby/queue');
             $queue->setObjectIds($batch);
             $queue->setObjectEntity($entity);
             $queue->setObjectAction($action);
+            $queue->setTransactionId($transactionId);
             $queue->save();
             $result[] = $queue->getId();
         }
@@ -56,10 +62,11 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
      * save changes to queue and notify cobby service
      *
      * @param $entity
-     * @param $ids
      * @param $action
+     * @param $ids
+     * @param $transactionId
      */
-    public function enqueueAndNotify($entity, $action, $ids)
+    public function enqueueAndNotify($entity, $action, $ids, $transactionId = null)
     {
         if (!Mage::isInstalled() || Mage::registry('is_cobby_import') == 1) { //do nothing if is cobby import
             return;
@@ -75,7 +82,7 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
             $manageStock == Mash2_Cobby_Helper_Settings::MANAGE_STOCK_READONLY ||
             $entity != 'stock') {
             try {
-                $queueIds = $this->enqueue($entity, $action, $ids);
+                $queueIds = $this->enqueue($entity, $action, $ids, $transactionId);
                 //notify only with with the id from the first batch
                 $this->cobbyApi->notifyCobbyService($entity, $action, $queueIds[0]);
 

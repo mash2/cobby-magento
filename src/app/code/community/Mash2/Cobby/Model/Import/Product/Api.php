@@ -36,7 +36,7 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
         return $result;
     }
 
-    public function importProducts($data, $typeModels, $usedSkus)
+    public function importProducts($data, $typeModels, $usedSkus, $transactionId)
     {
         if (!is_null($typeModels) && !is_array($typeModels)) {
             $typeModels = array($typeModels);
@@ -53,6 +53,7 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
             array('typeModels' => $transportObject->getTypeModels(),
                 'usedSkus' => $transportObject->getUsedSkus()))
             ->setBehavior(Mage_ImportExport_Model_Import::BEHAVIOR_REPLACE);
+        $importModel->setTransactionId($transactionId);
 
         $arrayAdapter = Mage::getModel('mash2_cobby/arrayAdapter', $transportObject->getRows());
         $validationResult = $importModel

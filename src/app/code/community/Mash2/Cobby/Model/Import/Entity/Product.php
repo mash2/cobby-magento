@@ -27,6 +27,8 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
     protected $_usedSkus = array();
 
+    protected $transactionId;
+
     /**
      * constructor
      *
@@ -316,7 +318,7 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
         if (!empty($productIds)) {
             Mage::getModel('mash2_cobby/product')->updateHash($productIds);
-            Mage::helper('mash2_cobby/queue')->enqueueAndNotify('product', 'save', $productIds);
+            Mage::helper('mash2_cobby/queue')->enqueueAndNotify('product', 'save', $productIds, $this->getTransactionId());
         }
 
         return $this;
@@ -659,5 +661,15 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
     {
         //we don't import images here, just skip
         return $this;
+    }
+
+    public function setTransactionId($transactionId)
+    {
+        $this->transactionId = $transactionId;
+    }
+
+    private function getTransactionId()
+    {
+        return $this->transactionId;
     }
 }
