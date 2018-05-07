@@ -45,12 +45,12 @@ class Mash2_Cobby_Mash2Controller extends Mage_Api_Controller_Action
         $session = Mage::getSingleton('mash2_cobby/admin_session');
         $auth = $session->login($username, $password);
         $result = '';
-        if($auth->getId()){
+
+        if($auth && $auth->getId()) {
             $result = $session->getSessionId();
         }
 
-        if(!empty($result))
-        {
+        if(!empty($result)) {
             $result = $result . ';' . $session->getUser()->getId(). ';' . $session->getUser()->getRole()->getId();
         }
 
