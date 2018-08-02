@@ -472,6 +472,10 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     protected function _initUploader()
     {
         $this->_fileUploader = Mage::getModel('importexport/import_uploader', null);
+        if ($this->_fileUploader == null) {
+            $this->_fileUploader = new Mage_ImportExport_Model_Import_Uploader();
+        }
+
         $this->_fileUploader->init();
         $this->_fileUploader->setAllowRenameFiles(!$this->settings->getOverwriteImages());
         $destDir = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/product';
