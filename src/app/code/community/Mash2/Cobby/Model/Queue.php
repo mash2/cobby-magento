@@ -20,9 +20,17 @@ class Mash2_Cobby_Model_Queue extends Mage_Core_Model_Abstract
 
     protected function _beforeSave()
     {
-        $context = $this->getCurrentContext();
-        $this->setUserName($this->getContextUserName($context));
-        $this->setContext($context);
+        $context = $this->getContext();
+        $username = $this->getUserName();
+
+        if (!isset($context)){
+            $context = $this->getCurrentContext();
+            $this->setContext($context);
+        }
+
+        if (!isset($username)) {
+            $this->setUserName($this->getContextUserName($context));
+        }
 
         parent::_beforeSave();
     }
@@ -87,5 +95,13 @@ class Mash2_Cobby_Model_Queue extends Mage_Core_Model_Abstract
         }
 
         return self::CONTEXT_NONE;
+    }
+
+    private function getCurrentUserName($entity) {
+        if($entity['userName']) {
+            return $entity['userName'];
+        } else {
+            return null;
+        }
     }
 }

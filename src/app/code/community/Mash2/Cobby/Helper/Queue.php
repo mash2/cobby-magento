@@ -35,9 +35,11 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
      * @param $action
      * @param $ids
      * @param $transactionId
+     * @param $context
+     * @param $username
      * @return array
      */
-    private function enqueue($entity, $action, $ids, $transactionId)
+    private function enqueue($entity, $action, $ids, $transactionId, $context, $username)
     {
         $result = array();
         if (!isset($transactionId)){
@@ -51,6 +53,8 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
             $queue->setObjectEntity($entity);
             $queue->setObjectAction($action);
             $queue->setTransactionId($transactionId);
+            $queue->setContext($context);
+            $queue->setUserName($username);
             $queue->save();
             $result[] = $queue->getId();
         }
@@ -64,9 +68,11 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
      * @param $entity
      * @param $action
      * @param $ids
-     * @param $transactionId
+     * @param null $transactionId
+     * @param null $context
+     * @param null $username
      */
-    public function enqueueAndNotify($entity, $action, $ids, $transactionId = null)
+    public function enqueueAndNotify($entity, $action, $ids, $transactionId = null, $context = null, $username = null)
     {
         if (!Mage::isInstalled() || Mage::registry('is_cobby_import') == 1) { //do nothing if is cobby import
             return;
@@ -82,7 +88,7 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
             $manageStock == Mash2_Cobby_Helper_Settings::MANAGE_STOCK_READONLY ||
             $entity != 'stock') {
             try {
-                $queueIds = $this->enqueue($entity, $action, $ids, $transactionId);
+                $queueIds = $this->enqueue($entity, $action, $ids, $transactionId, $context, $username);
                 //notify only with with the id from the first batch
                 $this->cobbyApi->notifyCobbyService($entity, $action, $queueIds[0]);
 
