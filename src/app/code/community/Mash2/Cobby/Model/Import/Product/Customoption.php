@@ -140,7 +140,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 $result[] = $productId;
             }
 
-            if( $productCustomOptions['remove'] ){
+            if ($productCustomOptions['remove']) {
                 foreach ($productCustomOptions['remove'] as $optionId){
                     $remove[] = $optionId;
                 }
@@ -148,7 +148,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
             }
         }
 
-        if( isset( $items ) ){
+        if(count($items)){
             foreach( $items as $productId => $item ) {
                 $this->connection->insertOnDuplicate($productTable, $item['product'], array('has_options', 'required_options', 'updated_at'));
                 if($item['options'] && count($item['options']) > 0) {
@@ -166,7 +166,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
             }
         }
 
-        if (isset ($remove)){
+        if (count($remove)){
             foreach ($remove as $optionId) {
                 $this->connection->delete($optionTable, array(
                     $this->connection->quoteInto('product_id = ?', $productId),
