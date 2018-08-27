@@ -133,6 +133,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     $items[$productId]['values'][] = array(
                         'option_type_id' => $nextValueId,
                         'option_id' => $nextOptionId,
+                        'action' => $value['action'],
                         'sku' => $value['sku'],
                         'sort_order' => $value['sort_order']
                     );
@@ -165,8 +166,8 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     case self::UPDATE:
                         $this->updateOption($items);
                         break;
-                    case self::NONE:
-                        return true;
+                    //case self::NONE:
+                      //  return true;
                 }
 
             }
@@ -248,6 +249,51 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 }
                 if($item['prices'] && count($item['prices']) > 0) {
                     $this->connection->update($this->priceTable, $item['prices'], array('price', 'price_type'));
+                }
+
+                $subOptions = array();
+
+                foreach ($item['values'] as $value) {
+                    $subOptions[$value['option_type_id']] = $value;
+                }
+                foreach ($item['values_titles'] as $value) {
+                    if (array_key_exists($value['option_type_id'], $subOptions)) {
+                        $subOptions[$value['option_type_id']]['values_titles'] = $value;
+                    }
+                }
+                foreach ($item['values_prices'] as $value) {
+                    if (array_key_exists($value['option_type_id'], $subOptions)) {
+                        $subOptions[$value['option_type_id']]['values_prices'] = $value;
+                    }
+                }
+
+
+                foreach ($subOptions as $subOption) {
+                    $action = $subOption['action'];
+                    $valuesTitles = $subOption['values_titles'];
+                    $valuesPrices= $subOption['values_prices'];
+                    unset($subOption['values_titles']);
+                    unset($subOption['values_prices']);
+                    unset($subOption['action']);
+
+                    switch ($action) {
+                        case self::ADD:
+                            $this->connection->insertOnDuplicate($this->typeValueTable, $subOption, array('sku', 'sort_order'));
+                            $this->connection->insertOnDuplicate($this->typeTitleTable, $valuesTitles, array('title'));
+                            $this->connection->insertOnDuplicate($this->typePriceTable, $valuesPrices, array('price', 'price_type'));
+                            break;
+                        case self::DELETE:
+                            $this->connection->delete($this->typeValueTable, $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id']));
+                            break;
+                        case self::UPDATE:
+                            $this->connection->update($this->typeValueTable, $subOption, array(
+                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
+                            $this->connection->update($this->typeTitleTable, $valuesTitles, array(
+                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
+                            $this->connection->update($this->typePriceTable, $valuesPrices, array(
+                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
+                    }
+
                 }
             }
         }
