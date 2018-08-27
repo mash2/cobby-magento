@@ -1,6 +1,22 @@
 <?php
 class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Import_Product_Abstract
 {
+    const ADD       = 'add';
+    const DELETE    = 'delete';
+    const NONE      = 'none';
+    const UPDATE    = 'update';
+
+    private $productTable;
+    private $optionTable;
+    private $priceTable;
+    private $titleTable;
+    private $typePriceTable;
+    private $typeTitleTable;
+    private $typeValueTable;
+    private $nextAutoOptionId;
+    private $nextAutoValueId;
+
+
     /**
      * @var Mash2_Cobby_Helper_Resource
      */
@@ -16,21 +32,26 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
         $this->resourceHelper = Mage::helper('mash2_cobby/resource');
     }
 
+    protected function init()
+    {
+        $coreResource   = Mage::getSingleton('core/resource');
+        $this->productTable   = $coreResource->getTableName('catalog/product');
+        $this->optionTable    = $coreResource->getTableName('catalog/product_option');
+        $this->priceTable     = $coreResource->getTableName('catalog/product_option_price');
+        $this->titleTable     = $coreResource->getTableName('catalog/product_option_title');
+        $this->typePriceTable = $coreResource->getTableName('catalog/product_option_type_price');
+        $this->typeTitleTable = $coreResource->getTableName('catalog/product_option_type_title');
+        $this->typeValueTable = $coreResource->getTableName('catalog/product_option_type_value');
+
+        $this->nextAutoOptionId   = $this->resourceHelper->getNextAutoincrement($this->optionTable);
+        $this->nextAutoValueId    = $this->resourceHelper->getNextAutoincrement($this->typeValueTable);
+    }
+
     public function import($rows)
     {
         $result = array();
 
-        $coreResource   = Mage::getSingleton('core/resource');
-        $productTable   = $coreResource->getTableName('catalog/product');
-        $optionTable    = $coreResource->getTableName('catalog/product_option');
-        $priceTable     = $coreResource->getTableName('catalog/product_option_price');
-        $titleTable     = $coreResource->getTableName('catalog/product_option_title');
-        $typePriceTable = $coreResource->getTableName('catalog/product_option_type_price');
-        $typeTitleTable = $coreResource->getTableName('catalog/product_option_type_title');
-        $typeValueTable = $coreResource->getTableName('catalog/product_option_type_value');
-
-        $nextAutoOptionId   = $this->resourceHelper->getNextAutoincrement($optionTable);
-        $nextAutoValueId    = $this->resourceHelper->getNextAutoincrement($typeValueTable);
+        $this->init();
 
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
@@ -63,7 +84,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 if(isset($productCustomOption['option_id'])) {
                     $nextOptionId = $productCustomOption['option_id'];
                 }else {
-                    $nextOptionId = $nextAutoOptionId++;
+                    $nextOptionId = $this->nextAutoOptionId++;
                 }
 
                 $items[$productId]['options'][] = array(
@@ -106,7 +127,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     if(isset($value['option_type_id'])){
                         $nextValueId = $value['option_type_id'];
                     } else {
-                        $nextValueId = $nextAutoValueId++;
+                        $nextValueId = $this->nextAutoValueId++;
                     }
 
                     $items[$productId]['values'][] = array(
@@ -133,12 +154,27 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                         );
                     }
                 }
+
+                switch ($productCustomOption['action']) {
+                    case self::ADD:
+                        $this->addOption($items);
+                        break;
+                    case self::DELETE:
+                        $this->deleteOption($productId, $productCustomOption['option_id']);
+                        break;
+                    case self::UPDATE:
+                        $this->updateOption($items);
+                        break;
+                    case self::NONE:
+                        return true;
+                }
+
             }
 
             $result[] = $productId;
         }
 
-        foreach($items as $productId => $item) {
+        /*foreach($items as $productId => $item) {
             $this->connection->delete($optionTable, $this->connection->quoteInto('product_id = ?', $productId));
             $this->connection->insertOnDuplicate($productTable, $item['product'], array('has_options', 'required_options', 'updated_at'));
             if($item['options'] && count($item['options']) > 0) {
@@ -153,12 +189,68 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     $this->connection->insertOnDuplicate($typePriceTable, $item['values_prices'], array('price', 'price_type'));
                 }
             }
-        }
+        }*/
 
         $this->touchProducts($changedProductIds);
 
         Mage::dispatchEvent('cobby_import_product_customoption_import_after', array( 'products' => $changedProductIds ));
 
         return true;
+    }
+
+
+    protected function addOption($options)
+    {
+        foreach($options as $productId => $item) {
+            $this->connection->insertOnDuplicate($this->productTable, $item['product'], array('has_options', 'required_options', 'updated_at'));
+            if($item['options'] && count($item['options']) > 0) {
+                $this->connection->insertOnDuplicate($this->optionTable, $item['options']);
+                $this->connection->insertOnDuplicate($this->titleTable, $item['titles'], array('title'));
+                if($item['prices'] && count($item['prices']) > 0) {
+                    $this->connection->insertOnDuplicate($this->priceTable, $item['prices'], array('price', 'price_type'));
+                }
+                if($item['values'] && count($item['values']) > 0) {
+                    $this->connection->insertOnDuplicate($this->typeValueTable, $item['values'], array('sku', 'sort_order'));
+                    $this->connection->insertOnDuplicate($this->typeTitleTable, $item['values_titles'], array('title'));
+                    $this->connection->insertOnDuplicate($this->typePriceTable, $item['values_prices'], array('price', 'price_type'));
+                }
+            }
+        }
+    }
+
+    protected function deleteOption($productId, $optionId)
+    {
+
+            $this->connection->delete($this->optionTable, array(
+                $this->connection->quoteInto('product_id = ?', $productId),
+                $this->connection->quoteInto('option_id = ?', $optionId)
+                )
+            );
+
+
+    }
+
+    protected function updateOption($options)
+    {
+        foreach ($options as $productId => $item) {
+            //unset($options['action']);
+            if($item['options'] && count($item['options']) > 0) {
+                foreach ($item['options'] as $option) {
+                    $optionId = $option['option_id'];
+                    $this->connection->update($this->optionTable, $option, array(
+                        $this->connection->quoteInto('option_id = ?', $optionId)
+                    ));
+                }
+                foreach ($item['titles'] as $title) {
+                    $this->connection->update($this->titleTable, $title, array(
+                        $this->connection->quoteInto('option_id = ?', $optionId)
+                    ));
+                }
+                if($item['prices'] && count($item['prices']) > 0) {
+                    $this->connection->update($this->priceTable, $item['prices'], array('price', 'price_type'));
+                }
+            }
+        }
+
     }
 }
