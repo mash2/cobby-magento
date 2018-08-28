@@ -1,10 +1,12 @@
 <?php
 class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Import_Product_Abstract
 {
-    const ADD       = 'add';
-    const DELETE    = 'delete';
-    const NONE      = 'none';
-    const UPDATE    = 'update';
+    const ADD           = 'add';
+    const DELETE        = 'delete';
+    const NONE          = 'none';
+    const UPDATE        = 'update';
+    const UPDATE_TYPE   = 'update_type';
+
 
     private $productTable;
     private $optionTable;
@@ -50,6 +52,12 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
     public function import($rows)
     {
         $result = array();
+        $action = array(
+            'add' => array(),
+            'delete' => array(),
+            'update' => array(),
+            'delete_price_table' => array()
+            );
 
         $this->init();
 
@@ -158,13 +166,23 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
 
                 switch ($productCustomOption['action']) {
                     case self::ADD:
-                        $this->addOption($items);
+                        $action['add'][] = $items;
+
+                        //$this->addOption($items);
                         break;
                     case self::DELETE:
-                        $this->deleteOption($productId, $productCustomOption['option_id']);
+                        $action['delete'][] = array($productId => $productCustomOption['option_id']);
+                        //$this->deleteOption($productId, $productCustomOption['option_id']);
                         break;
                     case self::UPDATE:
-                        $this->updateOption($items);
+                        $action['update'][] = $items;
+                        //$this->updateOption($items);
+                        break;
+                    case self::UPDATE_TYPE:
+                        //$this->connection->delete($this->priceTable, $this->connection->quoteInto('option_id = ?', $productCustomOption['option_id']));
+                        $action['delete_price_table'][] = $productCustomOption['option_id'];
+                        $action['update'][] = $items;
+                        //$this->updateOption($items);
                         break;
                     //case self::NONE:
                       //  return true;
@@ -191,6 +209,19 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 }
             }
         }*/
+
+        if (count($action['add']) > 0) {
+            $this->addOption($action['add']);
+        }
+        if (count($action['delete']) > 0) {
+            $this->deleteOption($action['delete']);
+        }
+        if (count($action['update']) > 0) {
+            $this->updateOption($action['update']);
+        }
+        if (count($action['delete_price_table']) > 0) {
+            $this->deletePriceTable($action['delete_price_table']);
+        }
 
         $this->touchProducts($changedProductIds);
 
@@ -219,16 +250,22 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
         }
     }
 
-    protected function deleteOption($productId, $optionId)
+    protected function deleteOption($options)
     {
-
+        foreach ($options as $productId => $optionId) {
             $this->connection->delete($this->optionTable, array(
                 $this->connection->quoteInto('product_id = ?', $productId),
-                $this->connection->quoteInto('option_id = ?', $optionId)
+                    $this->connection->quoteInto('option_id = ?', $optionId)
                 )
             );
+        }
+    }
 
-
+    protected function deletePriceTable($options)
+    {
+        foreach ($options as $option) {
+            $this->connection->delete($this->priceTable, $this->connection->quoteInto('option_id = ?', $option));
+        }
     }
 
     protected function updateOption($options)
