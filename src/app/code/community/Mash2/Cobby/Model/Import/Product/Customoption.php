@@ -52,28 +52,28 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
     public function import($rows)
     {
         $result = array();
-        $action = array(
-            'add' => array(),
-            'delete' => array(),
-            'update' => array(),
-            'delete_price_table' => array()
-            );
 
         $this->init();
 
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
         $changedProductIds = array();
+        $deletePriceTable = array();
+        $items = array
+        (
+            'add' => array(),
+            'delete' => array(),
+            'update' => array()
+        );
 
         Mage::dispatchEvent('cobby_import_product_customoption_import_before', array( 'products' => $productIds ));
 
-        $items = array();
         foreach($rows as $productId => $productCustomOptions) {
             if (!in_array($productId, $existingProductIds))
                 continue;
 
             $changedProductIds[] = $productId;
-            $items[$productId] = array(
+            $product[$productId] = array(
                 'product' =>  array(
                     'entity_id'        => $productId,
                     'has_options'      => 0,
@@ -95,7 +95,29 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     $nextOptionId = $this->nextAutoOptionId++;
                 }
 
-                $items[$productId]['options'][] = array(
+                $action = '';
+                switch ($productCustomOption['action']) {
+                    case self::ADD:
+                        $action = 'add';
+                        break;
+                        case self::DELETE:
+                        $action = 'delete';
+                        break;
+                    case self::UPDATE:
+                        $action = 'update';
+                        break;
+                    case self::UPDATE_TYPE:
+                        $deletePriceTable[] = $productCustomOption['option_id'];
+                        $action = 'update';
+                        break;
+
+                }
+
+                if (!isset($items[$action][$productId]['product'])) {
+                    $items[$action][$productId] = $product[$productId];
+                }
+
+                $items[$action][$productId]['options'][] = array(
                     'option_id'      => $nextOptionId,
                     'sku'            => $productCustomOption['sku'],
                     'max_characters' => $productCustomOption['max_characters'],
@@ -108,13 +130,13 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     'sort_order'     => $productCustomOption['sort_order'],
                 );
 
-                $items[$productId]['product']['has_options'] = 1;
+                $items[$action][$productId]['product']['has_options'] = 1;
                 if($productCustomOption['is_require'] == 1) { //if one is required, product should be set to required
-                    $items[$productId]['product']['required_options'] = 1;
+                    $items[$action][$productId]['product']['required_options'] = 1;
                 }
 
                 foreach($productCustomOption['titles'] as $productCustomOptionTitle) {
-                    $items[$productId]['titles'][] = array(
+                    $items[$action][$productId]['titles'][] = array(
                         'option_id' => $nextOptionId,
                         'store_id' => $productCustomOptionTitle['store_id'],
                         'title' => $productCustomOptionTitle['title']
@@ -122,7 +144,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 }
 
                 foreach($productCustomOption['prices'] as $productCustomOptionPrice) {
-                    $items[$productId]['prices'][] = array(
+                    $items[$action][$productId]['prices'][] = array(
                         'option_id' => $nextOptionId,
                         'store_id' => $productCustomOptionPrice['store_id'],
                         'price' => $productCustomOptionPrice['price'],
@@ -138,16 +160,26 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                         $nextValueId = $this->nextAutoValueId++;
                     }
 
-                    $items[$productId]['values'][] = array(
-                        'option_type_id' => $nextValueId,
-                        'option_id' => $nextOptionId,
-                        'action' => $value['action'],
-                        'sku' => $value['sku'],
-                        'sort_order' => $value['sort_order']
-                    );
+                    if ($productCustomOption['action'] == 'add' && $value['action'] == 'add') {
+                        $items[$action][$productId]['values'][] = array(
+                            'option_type_id' => $nextValueId,
+                            'option_id' => $nextOptionId,
+                            'sku' => $value['sku'],
+                            'sort_order' => $value['sort_order']
+                        );
+                    }
+                    else {
+                        $items[$action][$productId]['values'][] = array(
+                            'option_type_id' => $nextValueId,
+                            'option_id' => $nextOptionId,
+                            'action' => $value['action'],
+                            'sku' => $value['sku'],
+                            'sort_order' => $value['sort_order']
+                        );
+                    }
 
                     foreach($value['titles'] as $valueTitle) {
-                        $items[$productId]['values_titles'][] = array(
+                        $items[$action][$productId]['values_titles'][] = array(
                             'option_type_id' => $nextValueId,
                             'store_id' => $valueTitle['store_id'],
                             'title' => $valueTitle['title'],
@@ -155,7 +187,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     }
 
                     foreach($value['prices'] as $valuePrice) {
-                        $items[$productId]['values_prices'][] = array(
+                        $items[$action][$productId]['values_prices'][] = array(
                             'option_type_id' => $nextValueId,
                             'store_id' => $valuePrice['store_id'],
                             'price' => $valuePrice['price'],
@@ -163,64 +195,23 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                         );
                     }
                 }
-
-                switch ($productCustomOption['action']) {
-                    case self::ADD:
-                        $action['add'][] = $items;
-
-                        //$this->addOption($items);
-                        break;
-                    case self::DELETE:
-                        $action['delete'][] = array($productId => $productCustomOption['option_id']);
-                        //$this->deleteOption($productId, $productCustomOption['option_id']);
-                        break;
-                    case self::UPDATE:
-                        $action['update'][] = $items;
-                        //$this->updateOption($items);
-                        break;
-                    case self::UPDATE_TYPE:
-                        //$this->connection->delete($this->priceTable, $this->connection->quoteInto('option_id = ?', $productCustomOption['option_id']));
-                        $action['delete_price_table'][] = $productCustomOption['option_id'];
-                        $action['update'][] = $items;
-                        //$this->updateOption($items);
-                        break;
-                    //case self::NONE:
-                      //  return true;
-                }
-
             }
 
             $result[] = $productId;
         }
 
-        /*foreach($items as $productId => $item) {
-            $this->connection->delete($optionTable, $this->connection->quoteInto('product_id = ?', $productId));
-            $this->connection->insertOnDuplicate($productTable, $item['product'], array('has_options', 'required_options', 'updated_at'));
-            if($item['options'] && count($item['options']) > 0) {
-                $this->connection->insertOnDuplicate($optionTable, $item['options']);
-                $this->connection->insertOnDuplicate($titleTable, $item['titles'], array('title'));
-                if($item['prices'] && count($item['prices']) > 0) {
-                    $this->connection->insertOnDuplicate($priceTable, $item['prices'], array('price', 'price_type'));
-                }
-                if($item['values'] && count($item['values']) > 0) {
-                    $this->connection->insertOnDuplicate($typeValueTable, $item['values'], array('sku', 'sort_order'));
-                    $this->connection->insertOnDuplicate($typeTitleTable, $item['values_titles'], array('title'));
-                    $this->connection->insertOnDuplicate($typePriceTable, $item['values_prices'], array('price', 'price_type'));
-                }
-            }
-        }*/
+        if (count($deletePriceTable) > 0) {
+            $this->deletePriceTable($deletePriceTable);
+        }
 
-        if (count($action['add']) > 0) {
-            $this->addOption($action['add']);
+        if (count($items['add']) > 0) {
+            $this->addOption($items['add']);
         }
-        if (count($action['delete']) > 0) {
-            $this->deleteOption($action['delete']);
+        if (count($items['delete']) > 0) {
+            $this->deleteOption($items['delete']);
         }
-        if (count($action['update']) > 0) {
-            $this->updateOption($action['update']);
-        }
-        if (count($action['delete_price_table']) > 0) {
-            $this->deletePriceTable($action['delete_price_table']);
+        if (count($items['update']) > 0) {
+            $this->updateOption($items['update']);
         }
 
         $this->touchProducts($changedProductIds);
@@ -252,26 +243,24 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
 
     protected function deleteOption($options)
     {
-        foreach ($options as $productId => $optionId) {
-            $this->connection->delete($this->optionTable, array(
-                $this->connection->quoteInto('product_id = ?', $productId),
-                    $this->connection->quoteInto('option_id = ?', $optionId)
-                )
-            );
+        $items = array();
+        foreach ($options as $productId => $optionsTableData) {
+            foreach ($optionsTableData['options'] as $option) {
+                $items[] = $option['option_id'];
+            }
         }
+
+        $this->connection->delete($this->optionTable, array($this->connection->quoteInto('option_id IN (?)', $items)));
     }
 
-    protected function deletePriceTable($options)
+    protected function deletePriceTable($optionIds)
     {
-        foreach ($options as $option) {
-            $this->connection->delete($this->priceTable, $this->connection->quoteInto('option_id = ?', $option));
-        }
+        $this->connection->delete($this->priceTable, $this->connection->quoteInto('option_id IN (?)', $optionIds));
     }
 
     protected function updateOption($options)
     {
         foreach ($options as $productId => $item) {
-            //unset($options['action']);
             if($item['options'] && count($item['options']) > 0) {
                 foreach ($item['options'] as $option) {
                     $optionId = $option['option_id'];
@@ -279,58 +268,61 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                         $this->connection->quoteInto('option_id = ?', $optionId)
                     ));
                 }
+            }
+            if ($item['titles'] && count($item['titles']) > 0) {
                 foreach ($item['titles'] as $title) {
                     $this->connection->update($this->titleTable, $title, array(
-                        $this->connection->quoteInto('option_id = ?', $optionId)
+                        $this->connection->quoteInto('option_id = ?', $title['option_id'])
                     ));
                 }
-                if($item['prices'] && count($item['prices']) > 0) {
-                    $this->connection->update($this->priceTable, $item['prices'], array('price', 'price_type'));
+            }
+            if($item['prices'] && count($item['prices']) > 0) {
+                foreach ($item['prices'] as $price)
+                    $this->connection->update($this->priceTable, $price, array(
+                        $this->connection->quoteInto('option_id = ?', $price['option_id'])
+                    ));
+            }
+
+            $subOptions = array();
+
+            foreach ($item['values'] as $value) {
+                $subOptions[$value['option_type_id']] = $value;
+            }
+            foreach ($item['values_titles'] as $value) {
+                if (array_key_exists($value['option_type_id'], $subOptions)) {
+                    $subOptions[$value['option_type_id']]['values_titles'] = $value;
                 }
-
-                $subOptions = array();
-
-                foreach ($item['values'] as $value) {
-                    $subOptions[$value['option_type_id']] = $value;
+            }
+            foreach ($item['values_prices'] as $value) {
+                if (array_key_exists($value['option_type_id'], $subOptions)) {
+                    $subOptions[$value['option_type_id']]['values_prices'] = $value;
                 }
-                foreach ($item['values_titles'] as $value) {
-                    if (array_key_exists($value['option_type_id'], $subOptions)) {
-                        $subOptions[$value['option_type_id']]['values_titles'] = $value;
-                    }
-                }
-                foreach ($item['values_prices'] as $value) {
-                    if (array_key_exists($value['option_type_id'], $subOptions)) {
-                        $subOptions[$value['option_type_id']]['values_prices'] = $value;
-                    }
-                }
+            }
 
+            foreach ($subOptions as $subOption) {
+                $action = $subOption['action'];
+                $valuesTitles = $subOption['values_titles'];
+                $valuesPrices= $subOption['values_prices'];
+                unset($subOption['values_titles']);
+                unset($subOption['values_prices']);
+                unset($subOption['action']);
 
-                foreach ($subOptions as $subOption) {
-                    $action = $subOption['action'];
-                    $valuesTitles = $subOption['values_titles'];
-                    $valuesPrices= $subOption['values_prices'];
-                    unset($subOption['values_titles']);
-                    unset($subOption['values_prices']);
-                    unset($subOption['action']);
-
-                    switch ($action) {
-                        case self::ADD:
-                            $this->connection->insertOnDuplicate($this->typeValueTable, $subOption, array('sku', 'sort_order'));
-                            $this->connection->insertOnDuplicate($this->typeTitleTable, $valuesTitles, array('title'));
-                            $this->connection->insertOnDuplicate($this->typePriceTable, $valuesPrices, array('price', 'price_type'));
-                            break;
+                switch ($action) {
+                    case self::ADD:
+                        $this->connection->insertOnDuplicate($this->typeValueTable, $subOption, array('sku', 'sort_order'));
+                        $this->connection->insertOnDuplicate($this->typeTitleTable, $valuesTitles, array('title'));
+                        $this->connection->insertOnDuplicate($this->typePriceTable, $valuesPrices, array('price', 'price_type'));
+                        break;
                         case self::DELETE:
                             $this->connection->delete($this->typeValueTable, $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id']));
                             break;
-                        case self::UPDATE:
-                            $this->connection->update($this->typeValueTable, $subOption, array(
-                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                            $this->connection->update($this->typeTitleTable, $valuesTitles, array(
-                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                            $this->connection->update($this->typePriceTable, $valuesPrices, array(
-                                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                    }
-
+                            case self::UPDATE:
+                                $this->connection->update($this->typeValueTable, $subOption, array(
+                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
+                                $this->connection->update($this->typeTitleTable, $valuesTitles, array(
+                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
+                                $this->connection->update($this->typePriceTable, $valuesPrices, array(
+                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
                 }
             }
         }
