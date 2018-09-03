@@ -204,14 +204,14 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
             $this->deletePriceTable($deletePriceTable);
         }
 
-        if (count($items['add']) > 0) {
-            $this->addOption($items['add']);
+        if (count($items[self::ADD]) > 0) {
+            $this->addOption($items[self::ADD]);
         }
-        if (count($items['delete']) > 0) {
-            $this->deleteOption($items['delete']);
+        if (count($items[self::DELETE]) > 0) {
+            $this->deleteOption($items[self::DELETE]);
         }
-        if (count($items['update']) > 0) {
-            $this->updateOption($items['update']);
+        if (count($items[self::UPDATE]) > 0) {
+            $this->updateOption($items[self::UPDATE]);
         }
 
         $this->touchProducts($changedProductIds);
@@ -260,72 +260,190 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
 
     protected function updateOption($options)
     {
+        $subOptions = array();
+        $optionType = array();
+
         foreach ($options as $productId => $item) {
             if($item['options'] && count($item['options']) > 0) {
-                foreach ($item['options'] as $option) {
-                    $optionId = $option['option_id'];
-                    $this->connection->update($this->optionTable, $option, array(
-                        $this->connection->quoteInto('option_id = ?', $optionId)
-                    ));
-                }
+//                foreach ($item['options'] as $option) {
+//                    $optionId = $option['option_id'];
+//                    $this->connection->update($this->optionTable, $option, array(
+//                        $this->connection->quoteInto('option_id = ?', $optionId)
+//                    ));
+//                }
+                //$this->connection->update($this->optionTable, $item['options']);
+                $this->connection->insertOnDuplicate($this->optionTable, $item['options']);
+
             }
             if ($item['titles'] && count($item['titles']) > 0) {
-                foreach ($item['titles'] as $title) {
-                    $this->connection->update($this->titleTable, $title, array(
-                        $this->connection->quoteInto('option_id = ?', $title['option_id'])
-                    ));
-                }
+//                foreach ($item['titles'] as $title) {
+//                    $this->connection->update($this->titleTable, $title, array(
+//                        $this->connection->quoteInto('option_id = ?', $title['option_id'])
+//                    ));
+//                }
+//                $this->connection->update($this->titleTable, $item['titles'], array(
+//                    $this->connection->quoteInto('option_id IN (?)', $item['titles'])
+//                ));
+                $this->connection->insertOnDuplicate($this->titleTable, $item['titles']);
             }
             if($item['prices'] && count($item['prices']) > 0) {
-                foreach ($item['prices'] as $price)
-                    $this->connection->update($this->priceTable, $price, array(
-                        $this->connection->quoteInto('option_id = ?', $price['option_id'])
-                    ));
+//                foreach ($item['prices'] as $price) {
+//                    $this->connection->update($this->priceTable, $price, array(
+//                        $this->connection->quoteInto('option_id = ?', $price['option_id'])
+//                    ));
+//                }
+//                $this->connection->update($this->priceTable, $item['prices'], array(
+//                    $this->connection->quoteInto('option_id IN (?)', $item['prices'])
+//                ));
+                $this->connection->insertOnDuplicate($this->priceTable, $item['prices']);
             }
 
-            $subOptions = array();
+            /*
+             * $suboption[$action][$subOpId][$value|$title|$price]
+             */
 
             foreach ($item['values'] as $value) {
-                $subOptions[$value['option_type_id']] = $value;
+                $value['tableName'] = $this->typeValueTable;
+                $subOptions[$value['option_type_id']][] = $value;
             }
             foreach ($item['values_titles'] as $value) {
-                if (array_key_exists($value['option_type_id'], $subOptions)) {
-                    $subOptions[$value['option_type_id']]['values_titles'] = $value;
-                }
+                $value['tableName'] = $this->typeTitleTable;
+                $subOptions[$value['option_type_id']][] = $value;
             }
             foreach ($item['values_prices'] as $value) {
-                if (array_key_exists($value['option_type_id'], $subOptions)) {
-                    $subOptions[$value['option_type_id']]['values_prices'] = $value;
+                $value['tableName'] = $this->typePriceTable;
+                $subOptions[$value['option_type_id']][] = $value;
+            }
+
+            foreach ($subOptions as $subOptionId => $options) {
+                $action = null;
+                foreach ($options as $option) {
+                    if (isset($option['action'])) {
+                        $action = $option['action'];
+                        unset($option['action']);
+                    }
+                    $optionType[$action][$subOptionId][] = $option;
                 }
             }
 
-            foreach ($subOptions as $subOption) {
-                $action = $subOption['action'];
-                $valuesTitles = $subOption['values_titles'];
-                $valuesPrices= $subOption['values_prices'];
-                unset($subOption['values_titles']);
-                unset($subOption['values_prices']);
-                unset($subOption['action']);
+//            foreach ($item['values'] as $value) {
+//                $subOptionId = $value['option_type_id'];
+//                $action = $value['action'];
+//                unset($value['action']);
+//                $subOptions[$action][$subOptionId][$this->typeValueTable][] = $value;
+//            }
+//            foreach ($item['values_titles'] as $value) {
+//                $subOptions[$action][$subOptionId][$this->typeTitleTable][] = $value;
+//            }
+//            foreach ($item['values_prices'] as $value) {
+//                $subOptions[$action][$subOptionId][$this->typePriceTable][] = $value;
+//            }
 
-                switch ($action) {
-                    case self::ADD:
-                        $this->connection->insertOnDuplicate($this->typeValueTable, $subOption, array('sku', 'sort_order'));
-                        $this->connection->insertOnDuplicate($this->typeTitleTable, $valuesTitles, array('title'));
-                        $this->connection->insertOnDuplicate($this->typePriceTable, $valuesPrices, array('price', 'price_type'));
-                        break;
-                        case self::DELETE:
-                            $this->connection->delete($this->typeValueTable, $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id']));
-                            break;
-                            case self::UPDATE:
-                                $this->connection->update($this->typeValueTable, $subOption, array(
-                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                                $this->connection->update($this->typeTitleTable, $valuesTitles, array(
-                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                                $this->connection->update($this->typePriceTable, $valuesPrices, array(
-                                    $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
-                }
+//            foreach ($optionTypes as $table => $optionType) {
+//                $action = $optionType['action'];
+//                $valuesTitles = $optionType['values_titles'];
+//                $valuesPrices= $optionType['values_prices'];
+//                //unset($optionType['values_titles']);
+//                //unset($optionType['values_prices']);
+//                unset($optionType['action']);
+//
+//
+//                $subOptions[$action][$this->typeValueTable] = $optionType;
+//                $subOptions[$action][$this->typeTitleTable] = $valuesTitles;
+//                $subOptions[$action][$this->typePriceTable] = $valuesPrices;
+//            }
+        }
+
+//        if (count($subOptions[self::ADD]) > 0) {
+//            $this->addSubOption($subOptions[self::ADD]);
+//        }
+//        if (count($subOptions[self::DELETE]) > 0) {
+//            $this->deleteSubOption($subOptions[self::DELETE]);
+//        }
+//        if (count($subOptions[self::UPDATE]) > 0) {
+//            $this->updateSubOption($subOptions[self::UPDATE]);
+//        }
+
+        if (count($optionType[self::ADD]) > 0) {
+            $this->addSubOption($optionType[self::ADD]);
+        }
+        if (count($optionType[self::DELETE]) > 0) {
+            $this->deleteSubOption($optionType[self::DELETE]);
+        }
+        if (count($optionType[self::UPDATE]) > 0) {
+            $this->updateSubOption($optionType[self::UPDATE]);
+        }
+
+    }
+
+    protected function addSubOption($options)
+    {
+        $add = array();
+
+        foreach ($options as $subOptionId => $subOptions) {
+            foreach ($subOptions as $subOption) {
+                $tableName = $subOption['tableName'];
+                unset($subOption['tableName']);
+                $add[$tableName][] = $subOption;
+
+//                switch ($tableName) {
+//                    case $this->typeValueTable:
+//                        $values = array('sku', 'sort_order');
+//                        break;
+//                    case $this->typeTitleTable:
+//                        $values = array('title');
+//                        break;
+//                    case $this->typePriceTable:
+//                        $values = array('price', 'price_type');
+//                        break;
+//                }
+                //$this->connection->insertOnDuplicate($tableName, $subOptionValue, $values);
+            }
+        }
+        foreach ($add as $tableName => $value) {
+            $values = null;
+            switch ($tableName) {
+                case $this->typeValueTable:
+                    $values = array('sku', 'sort_order');
+                    break;
+                case $this->typeTitleTable:
+                    $values = array('title');
+                    break;
+                case $this->typePriceTable:
+                    $values = array('price', 'price_type');
+                    break;
+            }
+            $this->connection->insertOnDuplicate($tableName, $value, $values);
+        }
+
+    }
+
+    protected function deleteSubOption($options)
+    {
+        $optionTypeIds = array_keys($options);
+//        foreach ($options as $subOption) {
+//            $optionTypeIds[] = $subOption['option_type_id'];
+//        }
+
+        $this->connection->delete($this->typeValueTable, $this->connection->quoteInto('option_type_id IN (?)', $optionTypeIds));
+    }
+
+    protected function updateSubOption ($options)
+    {
+        $add = array();
+        foreach ($options as $subOptionId => $subOptions) {
+            foreach ($subOptions as $subOption) {
+                $tableName = $subOption['tableName'];
+                unset($subOption['tableName']);
+                $add[$tableName][] = $subOption;
+
+//            $this->connection->update($tableName, $subOption, array(
+//                $this->connection->quoteInto('option_type_id = ?', $subOption['option_type_id'])));
             }
         }
 
+        foreach ($add as $tableName => $value) {
+            $this->connection->insertOnDuplicate($tableName, $value);
+        }
     }
 }
