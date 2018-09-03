@@ -265,7 +265,6 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
         foreach ($options as $productId => $item) {
             if($item['options'] && count($item['options']) > 0) {
                 $this->connection->insertOnDuplicate($this->optionTable, $item['options']);
-
             }
             if ($item['titles'] && count($item['titles']) > 0) {
                 $this->connection->insertOnDuplicate($this->titleTable, $item['titles']);
@@ -297,8 +296,6 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                     $optionType[$action][$productId][$subOptionId][] = $option;
                 }
             }
-
-
         }
 
         if (count($optionType[self::ADD]) > 0) {
@@ -322,7 +319,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
     protected function addSubOption($options)
     {
         $add = array();
-        foreach ($options as $subOptionId => $subOptions) {
+        foreach ($options as $subOptions) {
             foreach ($subOptions as $subOption) {
                 $tableName = $subOption['tableName'];
                 unset($subOption['tableName']);
@@ -356,7 +353,7 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
     protected function updateSubOption ($options)
     {
         $add = array();
-        foreach ($options as $subOptionId => $subOptions) {
+        foreach ($options as $subOptions) {
             foreach ($subOptions as $subOption) {
                 $tableName = $subOption['tableName'];
                 unset($subOption['tableName']);
