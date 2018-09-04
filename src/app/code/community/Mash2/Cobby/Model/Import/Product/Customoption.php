@@ -98,17 +98,17 @@ class Mash2_Cobby_Model_Import_Product_Customoption extends Mash2_Cobby_Model_Im
                 $action = '';
                 switch ($productCustomOption['action']) {
                     case self::ADD:
-                        $action = 'add';
+                        $action = self::ADD;
                         break;
                         case self::DELETE:
-                        $action = 'delete';
+                        $action = self::DELETE;
                         break;
                     case self::UPDATE:
-                        $action = 'update';
+                        $action = self::UPDATE;
                         break;
                     case self::UPDATE_TYPE:
                         $deletePriceTable[] = $productCustomOption['option_id'];
-                        $action = 'update';
+                        $action = self::UPDATE;
                         break;
 
                 }
