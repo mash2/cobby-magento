@@ -324,13 +324,21 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $observer
+     */
     public function cobbyHandleChanges($observer)
     {
-        $entity = $observer->getEntity();
+        $entity     = $observer->getEntity();
+        $username   = $observer->getUsername();
+        $action     = $observer->getAction();
+        $context    = $observer->getContext();
+        $ids        = $observer->getIds();
+
         if ($entity == 'product') {
             Mage::getModel('mash2_cobby/product')->updateHash($observer->getIds());
         }
 
-        $this->queueHelper->enqueueAndNotify($entity, $observer->getAction(), $observer->getIds());
+        $this->queueHelper->enqueueAndNotify($entity, $action, $ids, null, $context, $username);
     }
 }

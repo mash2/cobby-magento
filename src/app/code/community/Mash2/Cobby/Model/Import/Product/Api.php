@@ -116,7 +116,7 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
     {
         $model = Mage::getModel('mash2_cobby/import_product_stock');
         $result = $model->import($data);
-
+        
         return $result;
     }
 

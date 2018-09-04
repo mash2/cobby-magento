@@ -9,6 +9,7 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
     const ERROR_FILE_NOT_FOUND      = 1;
     const ERROR_FILE_NOT_DOWNLOADED = 2;
+    const ERROR_MEMORY_LIMIT        = 'memory';
     const ATTRIBUTE_CODES           = 'attribute_codes';
     const ATTRIBUTE_IDS             = 'attribute_ids';
     const IMPORT_FOLDER_NOT_EXISTS  = 'import_folder_not_exists';
@@ -459,7 +460,12 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
 
                 return true;
             } catch (Exception $e) {
-                return false;
+                if ((stripos($e->getMessage(),self::ERROR_MEMORY_LIMIT)) !== false) {
+                    Mage::throwException($e->getMessage());
+                } else {
+                    return false;
+                }
+
             }
         }
     }
@@ -472,6 +478,10 @@ class Mash2_Cobby_Model_Import_Product_Media extends Mash2_Cobby_Model_Import_Pr
     protected function _initUploader()
     {
         $this->_fileUploader = Mage::getModel('importexport/import_uploader', null);
+        if ($this->_fileUploader == null) {
+            $this->_fileUploader = new Mage_ImportExport_Model_Import_Uploader();
+        }
+
         $this->_fileUploader->init();
         $this->_fileUploader->setAllowRenameFiles(!$this->settings->getOverwriteImages());
         $destDir = Mage::getConfig()->getOptions()->getMediaDir() . '/catalog/product';
