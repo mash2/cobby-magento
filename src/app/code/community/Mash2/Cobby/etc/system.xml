@@ -57,7 +57,7 @@
                         </api_user>
                         <api_key module="mash2_cobby" translate="label comment tooltip">
                             <label>API Key</label>
-                            <frontend_type>obscure</frontend_type>
+                            <frontend_type>password</frontend_type>
                             <tooltip>Only users with ACL for cobby will be shown.</tooltip>
                             <comment>Fill in the API key of the chosen user.</comment>
                             <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
