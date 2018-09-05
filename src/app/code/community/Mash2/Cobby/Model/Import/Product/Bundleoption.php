@@ -1,6 +1,15 @@
 <?php
 class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Import_Product_Abstract
 {
+    protected $optionTable;
+    protected $titleTable;
+    protected $selectionTable;
+    protected $selectionPriceTable;
+    protected $relationTable;
+
+    protected $nextAutoOptionId;
+    protected $nextAutoSelectionId;
+
     /**
      * @var Mash2_Cobby_Helper_Resource
      */
@@ -16,19 +25,34 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
         $this->resourceHelper = Mage::helper('mash2_cobby/resource');
     }
 
+    protected function init()
+    {
+        $coreResource               = Mage::getSingleton('core/resource');
+
+        $this->optionTable          = $coreResource->getTableName('bundle/option');
+        $this->titleTable           = $coreResource->getTableName('bundle/option_value');
+        $this->selectionTable       = $coreResource->getTableName('bundle/selection');
+        $this->selectionPriceTable  = $coreResource->getTableName('bundle/selection_price');
+        $this->relationTable        = $coreResource->getTableName('catalog/product_relation');
+
+        $this->nextAutoOptionId     = $this->resourceHelper->getNextAutoincrement($this->optionTable);
+        $this->nextAutoSelectionId  = $this->resourceHelper->getNextAutoincrement($this->selectionTable);
+    }
+
     public function import($rows)
     {
         $result = array();
+        $this->init();
 
-        $coreResource           = Mage::getSingleton('core/resource');
-        $optionTable            = $coreResource->getTableName('bundle/option');
-        $titleTable             = $coreResource->getTableName('bundle/option_value');
-        $selectionTable         = $coreResource->getTableName('bundle/selection');
-        $selectionPriceTable    = $coreResource->getTableName('bundle/selection_price');
-        $relationTable          = $coreResource->getTableName('catalog/product_relation');
-
-        $nextAutoOptionId       = $this->resourceHelper->getNextAutoincrement($optionTable);
-        $nextAutoSelectionId    = $this->resourceHelper->getNextAutoincrement($selectionTable);
+//        $coreResource           = Mage::getSingleton('core/resource');
+//        $optionTable            = $coreResource->getTableName('bundle/option');
+//        $titleTable             = $coreResource->getTableName('bundle/option_value');
+//        $selectionTable         = $coreResource->getTableName('bundle/selection');
+//        $selectionPriceTable    = $coreResource->getTableName('bundle/selection_price');
+//        $relationTable          = $coreResource->getTableName('catalog/product_relation');
+//
+//        $nextAutoOptionId       = $this->resourceHelper->getNextAutoincrement($optionTable);
+//        $nextAutoSelectionId    = $this->resourceHelper->getNextAutoincrement($selectionTable);
 
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
@@ -59,7 +83,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                 if (isset($productBundleOption['option_id'])) {
                     $nextOptionId = $productBundleOption['option_id'];
                 } else {
-                    $nextOptionId = $nextAutoOptionId++;
+                    $nextOptionId = $this->nextAutoOptionId++;
                 }
 
                 $items[$productId]['options'][] = array(
@@ -83,7 +107,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                     if(isset($selection['selection_id'])){
                         $nextSelectionId = $selection['selection_id'];
                     } else {
-                        $nextSelectionId = $nextAutoSelectionId++;
+                        $nextSelectionId = $this->nextAutoSelectionId++;
                     }
 
                     $items[$productId]['selections'][] = array(
@@ -122,27 +146,62 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
             }
         }
 
-        foreach ($items as $productId => $item) {
-            $this->connection->delete($optionTable, $this->connection->quoteInto('parent_id = ?', $productId));
-            $this->connection->delete($relationTable, $this->connection->quoteInto('parent_id = ?', $productId));
-            if ($item['options'] && count($item['options']) > 0) {
-                $this->connection->insertOnDuplicate($optionTable, $item['options']);
-                $this->connection->insertOnDuplicate($titleTable, $item['titles'], array('title'));
-                if ($item['selections'] && count($item['selections']) > 0) {
-                    $this->connection->insertMultiple($selectionTable, $item['selections']);
-                    $this->connection->insertOnDuplicate($relationTable, $item['relations']);
-                    if ($item['prices'] && count($item['prices']> 0)) {
-                        $this->connection->insertOnDuplicate($selectionPriceTable, $item['prices'], array('selection_price_value', 'selection_price_type'));
-                    }
-                }
-            }
-            $result[] = $productId;
-        }
+        $result[] = $this->deleteBundle($items);
+        $result[] = $this->addBundle($items);
+
+//        foreach ($items as $productId => $item) {
+//            $this->connection->delete($optionTable, $this->connection->quoteInto('parent_id = ?', $productId));
+//            $this->connection->delete($relationTable, $this->connection->quoteInto('parent_id = ?', $productId));
+//            if ($item['options'] && count($item['options']) > 0) {
+//                $this->connection->insertOnDuplicate($optionTable, $item['options']);
+//                $this->connection->insertOnDuplicate($titleTable, $item['titles'], array('title'));
+//                if ($item['selections'] && count($item['selections']) > 0) {
+//                    $this->connection->insertMultiple($selectionTable, $item['selections']);
+//                    $this->connection->insertOnDuplicate($relationTable, $item['relations']);
+//                    if ($item['prices'] && count($item['prices']> 0)) {
+//                        $this->connection->insertOnDuplicate($selectionPriceTable, $item['prices'], array('selection_price_value', 'selection_price_type'));
+//                    }
+//                }
+//            }
+//            $result[] = $productId;
+//        }
+
 
         $this->touchProducts($changedProductIds);
 
         Mage::dispatchEvent('cobby_import_product_bundleoption_import_after', array( 'products' => $changedProductIds));
 
         return array('product_ids' => $result);
+    }
+
+    protected function addBundle($items)
+    {
+        foreach ($items as $productId => $item) {
+            if ($item['options'] && count($item['options']) > 0) {
+                $this->connection->insertOnDuplicate($this->optionTable, $item['options']);
+                $this->connection->insertOnDuplicate($this->titleTable, $item['titles'], array('title'));
+                if ($item['selections'] && count($item['selections']) > 0) {
+                    $this->connection->insertMultiple($this->selectionTable, $item['selections']);
+                    $this->connection->insertOnDuplicate($this->relationTable, $item['relations']);
+                    if ($item['prices'] && count($item['prices']) > 0) {
+                        $this->connection->insertOnDuplicate($this->selectionPriceTable, $item['prices'], array('selection_price_value', 'selection_price_type'));
+                    }
+                }
+            }
+            $result[] = $productId;
+        }
+    }
+
+    protected function deleteBundle($items)
+    {
+        $result = array();
+        foreach ($items as $productId => $item) {
+            $this->connection->delete($this->optionTable, $this->connection->quoteInto('parent_id = ?', $productId));
+            $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id = ?', $productId));
+
+            $result[] = $productId;
+        }
+
+        return $result;
     }
 }
