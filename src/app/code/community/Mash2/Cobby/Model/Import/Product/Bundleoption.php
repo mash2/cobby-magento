@@ -1,6 +1,10 @@
 <?php
 class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Import_Product_Abstract
 {
+    const ADD           = 'add';
+    const DELETE        = 'delete';
+    const UPDATE        = 'update';
+
     protected $optionTable;
     protected $titleTable;
     protected $selectionTable;
@@ -44,41 +48,42 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
         $result = array();
         $this->init();
 
-//        $coreResource           = Mage::getSingleton('core/resource');
-//        $optionTable            = $coreResource->getTableName('bundle/option');
-//        $titleTable             = $coreResource->getTableName('bundle/option_value');
-//        $selectionTable         = $coreResource->getTableName('bundle/selection');
-//        $selectionPriceTable    = $coreResource->getTableName('bundle/selection_price');
-//        $relationTable          = $coreResource->getTableName('catalog/product_relation');
-//
-//        $nextAutoOptionId       = $this->resourceHelper->getNextAutoincrement($optionTable);
-//        $nextAutoSelectionId    = $this->resourceHelper->getNextAutoincrement($selectionTable);
-
         $productIds = array_keys($rows);
         $existingProductIds = $this->loadExistingProductIds($productIds);
         $changedProductIds = array();
 
+        $items = array
+        (
+            'add' => array(),
+            'delete' => array(),
+            'update' => array()
+        );
+
         Mage::dispatchEvent('cobby_import_product_bundleoption_import_before', array( 'products' => $productIds));
 
-        $items = array();
         foreach($rows as $productId => $productBundleOptions) {
             if (!in_array($productId, $existingProductIds))
                 continue;
 
             $changedProductIds[] = $productId;
-            $items[$productId] = array(
-                'relations' =>  array(),
-                'options' => array(),
-                'titles' => array(),
-                'prices' => array(),
-                'selections' => array(),
-            );
+//            $items[$productId] = array(
+//                'relations' =>  array(),
+//                'options' => array(),
+//                'titles' => array(),
+//                'prices' => array(),
+//                'selections' => array(),
+//            );
 
             $selectionIndex = 0;
             foreach($productBundleOptions as $productBundleOption) {
-                if($productBundleOption['status'] == 'Delete') {
-                    continue;
-                }
+                $action = $productBundleOption['action'];
+//                 if($action == self::DELETE) {
+//                     continue;
+//                 }
+//
+//                if (!isset($items[$action][$productId]['product'])) {
+//                    $items[$action][$productId] = $product[$productId];
+//                }
 
                 if (isset($productBundleOption['option_id'])) {
                     $nextOptionId = $productBundleOption['option_id'];
@@ -86,7 +91,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                     $nextOptionId = $this->nextAutoOptionId++;
                 }
 
-                $items[$productId]['options'][] = array(
+                $items[$action][$productId]['options'][] = array(
                     'option_id'     => $nextOptionId,
                     'parent_id'     => $productId,
                     'type'          => $productBundleOption['type'],
@@ -95,7 +100,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                 );
 
                 foreach ($productBundleOption['titles'] as $productCustomOptionTitle) {
-                    $items[$productId]['titles'][] = array(
+                    $items[$action][$productId]['titles'][] = array(
                         'option_id' => $nextOptionId,
                         'store_id'  => $productCustomOptionTitle['store_id'],
                         'title'     => $productCustomOptionTitle['title']
@@ -110,7 +115,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                         $nextSelectionId = $this->nextAutoSelectionId++;
                     }
 
-                    $items[$productId]['selections'][] = array(
+                    $items[$action][$productId]['selections'][] = array(
                         'selection_id' => $nextSelectionId,
                         'option_id' => $nextOptionId,
                         'product_id' => $selection['assigned_product_id'],
@@ -121,7 +126,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                         'selection_can_change_qty' => $selection['can_change_qty'],
                     );
 
-                    $items[$productId]['relations'][] = array(
+                    $items[$action][$productId]['relations'][] = array(
                         'parent_id' => $productId,
                         'child_id'  => $selection['assigned_product_id']
                     );
@@ -130,11 +135,11 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
                     foreach ($selection['prices'] as $selectionPrice) {
                         $websiteId = $selectionPrice['website_id'];
                         if($websiteId == 0 ){
-                            $items[$productId]['selections'][$selectionIndex]['selection_price_value'] = $selectionPrice['price_value'];
-                            $items[$productId]['selections'][$selectionIndex]['selection_price_type'] = $selectionPrice['price_type'];
+                            $items[$action][$productId]['selections'][$selectionIndex]['selection_price_value'][] = $selectionPrice['price_value'];
+                            $items[$action][$productId]['selections'][$selectionIndex]['selection_price_type'][] = $selectionPrice['price_type'];
                             $selectionIndex++;
                         } else {
-                            $items[$productId]['prices'][] = array(
+                            $items[$action][$productId]['prices'][] = array(
                                 'selection_id'          => $nextSelectionId,
                                 'website_id'            => $websiteId,
                                 'selection_price_value' => $selectionPrice['price_value'],
@@ -146,26 +151,15 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
             }
         }
 
-        $result[] = $this->deleteBundle($items);
-        $result[] = $this->addBundle($items);
-
-//        foreach ($items as $productId => $item) {
-//            $this->connection->delete($optionTable, $this->connection->quoteInto('parent_id = ?', $productId));
-//            $this->connection->delete($relationTable, $this->connection->quoteInto('parent_id = ?', $productId));
-//            if ($item['options'] && count($item['options']) > 0) {
-//                $this->connection->insertOnDuplicate($optionTable, $item['options']);
-//                $this->connection->insertOnDuplicate($titleTable, $item['titles'], array('title'));
-//                if ($item['selections'] && count($item['selections']) > 0) {
-//                    $this->connection->insertMultiple($selectionTable, $item['selections']);
-//                    $this->connection->insertOnDuplicate($relationTable, $item['relations']);
-//                    if ($item['prices'] && count($item['prices']> 0)) {
-//                        $this->connection->insertOnDuplicate($selectionPriceTable, $item['prices'], array('selection_price_value', 'selection_price_type'));
-//                    }
-//                }
-//            }
-//            $result[] = $productId;
-//        }
-
+        if (count($items[self::ADD]) > 0) {
+            $result[] = $this->addBundle($items[self::ADD]);
+        }
+        if (count($items[self::DELETE]) > 0) {
+            $result[] = $this->deleteBundle($items[self::DELETE]);
+        }
+        if (count($items[self::UPDATE]) > 0) {
+            $result[] = $this->updateBundle($items[self::UPDATE]);
+        }
 
         $this->touchProducts($changedProductIds);
 
@@ -176,6 +170,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
 
     protected function addBundle($items)
     {
+        $result = array();
         foreach ($items as $productId => $item) {
             if ($item['options'] && count($item['options']) > 0) {
                 $this->connection->insertOnDuplicate($this->optionTable, $item['options']);
@@ -190,18 +185,24 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
             }
             $result[] = $productId;
         }
+        return $result;
     }
 
     protected function deleteBundle($items)
     {
         $result = array();
         foreach ($items as $productId => $item) {
-            $this->connection->delete($this->optionTable, $this->connection->quoteInto('parent_id = ?', $productId));
-            $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id = ?', $productId));
-
             $result[] = $productId;
         }
 
+        $this->connection->delete($this->optionTable, $this->connection->quoteInto('parent_id IN (?)', $result));
+        $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id IN (?)', $result));
+
         return $result;
+    }
+
+    protected function updateBundle($items)
+    {
+
     }
 }
