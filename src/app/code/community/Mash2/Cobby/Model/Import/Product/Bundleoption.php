@@ -190,15 +190,22 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
 
     protected function deleteBundle($items)
     {
-        $result = array();
+        $optionIds = array();
+        $selectionIds = array();
         foreach ($items as $productId => $item) {
-            $result[] = $productId;
+            foreach ($item['options'] as $option) {
+                $optionIds[] = $option['option_id'];
+
+            }
+            foreach ($items['selections'] as $productId => $selection) {
+                $selectionIds[] = $selection[''];
+            }
         }
 
-        $this->connection->delete($this->optionTable, $this->connection->quoteInto('parent_id IN (?)', $result));
-        $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id IN (?)', $result));
+        $this->connection->delete($this->optionTable, $this->connection->quoteInto('option_id IN (?)', $optionIds));
+        $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id IN (?)', $selectionIds));
 
-        return $result;
+        return $optionIds;
     }
 
     protected function updateBundle($items)
