@@ -203,7 +203,7 @@ class Mash2_Cobby_Model_Import_Product_Bundleoption extends Mash2_Cobby_Model_Im
         }
 
         $this->connection->delete($this->optionTable, $this->connection->quoteInto('option_id IN (?)', $optionIds));
-        $this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id IN (?)', $selectionIds));
+        //$this->connection->delete($this->relationTable, $this->connection->quoteInto('parent_id IN (?)', $selectionIds));
 
         return $optionIds;
     }
