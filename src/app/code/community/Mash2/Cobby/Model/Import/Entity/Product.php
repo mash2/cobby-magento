@@ -169,10 +169,9 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
 
         if (self::SCOPE_DEFAULT == $rowScope) { // SKU is specified, row is SCOPE_DEFAULT, new product block begins
             $sku = $rowData[self::COL_SKU];
-            $entityId = $rowData[self::COL_ENTITY_ID];
 
-            if (!empty($entityId) && !isset($this->_oldSku[$sku])) { // can we get all necessary data from existant DB product?
-                $this->addRowError('sku ' . $sku . ' does not match product id ' . $entityId, $rowNum);
+            if (isset($rowData[self::COL_ENTITY_ID]) && !empty($rowData[self::COL_ENTITY_ID]) && !isset($this->_oldSku[$sku])) { // can we get all necessary data from existant DB product?
+                $this->addRowError('sku ' . $sku . ' does not match product id ' . $rowData[self::COL_ENTITY_ID], $rowNum);
             }
         }
 

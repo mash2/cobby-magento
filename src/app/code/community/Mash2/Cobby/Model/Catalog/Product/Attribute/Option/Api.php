@@ -15,7 +15,7 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Option_Api extends Mage_Catalo
             $this->_fault('attribute_not_exists');
         }
 
-        $result = $this->options($attributeId, null);
+        $result = $this->options($attributeId);
         $transportObject = new Varien_Object();
         $transportObject->setOptions($result);
         $attribute = Mage::getModel('catalog/product')
@@ -71,7 +71,7 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Option_Api extends Mage_Catalo
      * @param string $filter
      * @return array
      */
-    public function options($attributeId, $filter)
+    public function options($attributeId, $filter = null)
     {
         $result = array();
         $stores = Mage::app()->getStores(true);
@@ -97,7 +97,7 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Option_Api extends Mage_Catalo
 
             if ($attribute->usesSource()) {
                 if ($attribute->getSource() instanceof Mage_Eav_Model_Entity_Attribute_Source_Table) {
-                    if ($filter) {
+                    if ($filter != null) {
                         $options = Mage::getResourceModel('eav/entity_attribute_option_collection')
                             ->addFieldToFilter('tdv.value', $filter)
                             ->setPositionOrder('asc')
