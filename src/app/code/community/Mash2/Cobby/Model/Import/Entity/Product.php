@@ -512,6 +512,24 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
     }
 
     /**
+     * Returns attributes all values in label-value or value-value pairs form. Labels are lower-cased.
+     *
+     * @param Mage_Eav_Model_Entity_Attribute_Abstract $attribute
+     * @param array $indexValAttrs OPTIONAL Additional attributes' codes with index values.
+     * @return array
+     */
+    public function getAttributeOptions(Mage_Eav_Model_Entity_Attribute_Abstract $attribute, $indexValAttrs = array())
+    {
+        if ($attribute->getFrontendInput() === 'boolean' &&
+            ($attribute->getData('source_model') == '' || $attribute->getData('source_model') == 'eav/entity_attribute_source_table')
+        ) {
+            $attribute->setSourceModel('eav/entity_attribute_source_boolean');
+        }
+
+        return parent::getAttributeOptions($attribute, $indexValAttrs);
+    }
+
+    /**
      * Check one attribute. Can be overridden in child.
      *
      * @param string $attrCode   Attribute code
