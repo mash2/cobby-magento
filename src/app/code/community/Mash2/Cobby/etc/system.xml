@@ -16,6 +16,16 @@
                     <expanded>1</expanded>
                     <fields>
 
+                        <active module="mash2_cobby" translate="lable tooltip">
+                            <label>Active</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <tooltip>Activate or deactivate cobby module</tooltip>
+                            <sort_order>5</sort_order>
+                            <validate>validate-select</validate>
+                            <show_in_default>1</show_in_default>
+                        </active>
+
                         <license_key module="mash2_cobby" translate="label tooltip">
                             <label>License key</label>
                             <frontend_type>text</frontend_type>

@@ -16,6 +16,7 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     const XML_PATH_COBBY_MANAGE_STOCK                   = 'cobby/stock/manage';
     const XML_PATH_COBBY_PRODUCT_QUANTITY               = 'cobby/stock/quantity';
     const XML_PATH_COBBY_STOCK_AVAILABILITY             = 'cobby/stock/availability';
+    const XML_PATH_COBBY_SETTINGS_ACTIVE                = 'cobby/settings/active';
     const MANAGE_STOCK_ENABLED                          = 0;
     const MANAGE_STOCK_READONLY                         = 1;
     const MANAGE_STOCK_DISABLED                         = 2;
@@ -93,6 +94,36 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig(self::XML_PATH_COBBY_VERSION);
     }
 
+    public function isCobbyEnabled()
+    {
+        $enabled = $this->getCobbyActive();
+        $apiUser = $this->getApiUser();
+        $license = $this->getLicenseKey();
+
+        if ($enabled && isset($apiUser) && isset($license)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function setCobbyActive($value)
+    {
+        Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_SETTINGS_ACTIVE, $value);
+        return true;
+    }
+
+    public function getCobbyActive()
+    {
+        $status = Mage::getStoreConfig(self::XML_PATH_COBBY_SETTINGS_ACTIVE);
+
+        if($status === "0") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     /**
      * Get contact e-mail
      *
@@ -145,15 +176,15 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
      */
     public function getApiUser()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_COBBY_SETTINGS_API_USER);
+        return Mage::getStoreConfig(self::XML_PATH_COBBY_SETTINGS_API_USER);
     }
 
     public function getApiPassword()
     {
-        $password = $this->scopeConfig->getValue(self::XML_PATH_COBBY_SETTINGS_API_PASSWORD);
+        $password = Mage::getStoreConfig(self::XML_PATH_COBBY_SETTINGS_API_PASSWORD);
         if (empty($password)) {
             return '';
         }
-        return $this->encryptor->decrypt($password);
+        return Mage::helper('core')->decrypt($password);
     }
 }

@@ -26,6 +26,11 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
     private $cobbyApi;
 
     /**
+     * @var Mash2_Cobby_Helper_Settings
+     */
+    private $settings;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -33,6 +38,7 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
         $this->helper = Mage::helper('mash2_cobby');
         $this->cobbyApi = Mage::helper('mash2_cobby/cobbyapi');
         $this->queueHelper = Mage::helper('mash2_cobby/queue');
+        $this->settings = Mage::helper('mash2_cobby/settings');
     }
 
     /**
@@ -48,7 +54,7 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
 
         switch($chooseUser){
             case 1: // use existing user
-                $apiUserName = Mage::getStoreConfig('cobby/settings/api_user');
+                $apiUserName = $this->settings->getApiUser();
                 $apiKey = Mage::helper('core')->decrypt(Mage::getStoreConfig('cobby/settings/api_key'));
                 break;
             case 2: // create new user
@@ -85,19 +91,15 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
                 return $this;
         }
 
-        $result = $this->cobbyApi->registerShop($apiUserName, $apiKey);
+        if ($this->settings->getCobbyActive()) {
+            $result = $this->cobbyApi->registerShop($apiUserName, $apiKey);
 
-//        Mage::getModel('core/config')->saveConfig('cobby/settings/license_key', $licenseKey);
+            Mage::getSingleton('index/indexer')
+                ->getProcessByCode('cobby_sync')
+                ->changeStatus(Mage_Index_Model_Process::STATUS_RUNNING);
 
-        Mage::getSingleton('index/indexer')
-            ->getProcessByCode('cobby_sync')
-            ->changeStatus(Mage_Index_Model_Process::STATUS_RUNNING);
-
-        Mage::getSingleton('core/session')->addSuccess(Mage::helper('mash2_cobby')->__(self::SUCCESS_MESSAGE));
-
-        //TODO: cache leeren?
-        // clean cache
-//        Mage::app()->getCacheInstance()->cleanType('config');
+            Mage::getSingleton('core/session')->addSuccess(Mage::helper('mash2_cobby')->__(self::SUCCESS_MESSAGE));
+        }
 
         return $this;
     }

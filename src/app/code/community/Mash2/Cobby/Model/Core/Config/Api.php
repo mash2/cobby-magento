@@ -22,6 +22,13 @@ class Mash2_Cobby_Model_Core_Config_Api extends Mage_Api_Model_Resource_Abstract
         Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_MANAGE_STOCK
     );
 
+    private $settings;
+
+    public function __construct()
+    {
+        $this->settings = Mage::helper('mash2_cobby/settings');
+    }
+
     /**
      * Retrieve cobby relevant configs
      *
@@ -65,5 +72,18 @@ class Mash2_Cobby_Model_Core_Config_Api extends Mage_Api_Model_Resource_Abstract
         }
 
         return $result;
+    }
+
+    public function active($data)
+    {
+        $value = 0;
+
+        if($data['active'] == 'true') {
+            $value = 1;
+        }
+
+        $this->settings->setCobbyActive($value);
+
+        return $data;
     }
 }

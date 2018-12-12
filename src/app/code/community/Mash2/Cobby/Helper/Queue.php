@@ -74,6 +74,9 @@ class Mash2_Cobby_Helper_Queue extends Mage_Core_Helper_Abstract
      */
     public function enqueueAndNotify($entity, $action, $ids, $transactionId = null, $context = null, $username = null)
     {
+        if (!$this->settings->isCobbyEnabled()) {
+            return;
+        }
         if (!Mage::isInstalled() || Mage::registry('is_cobby_import') == 1) { //do nothing if is cobby import
             return;
         }
