@@ -1,0 +1,23 @@
+#cobby_system_check  table td {
+    padding: 5px 10px;
+    vertical-align: top;
+}
+
+#cobby_system_check .ok {
+    color: green;
+    padding: 10px;
+}
+
+#cobby_system_check .error {
+    color: red;
+    padding: 10px;
+}
+
+#cobby_system_check .exception {
+    color: orange;
+    padding: 10px;
+}
+
+#cobby_system_check .field-tooltip {
+    cursor: pointer;
+}

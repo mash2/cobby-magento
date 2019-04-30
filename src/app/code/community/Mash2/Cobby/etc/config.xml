@@ -306,6 +306,17 @@
             </api>
         </routers>
     </frontend>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Mash2_Cobby after="Mage_Adminhtml">Mash2_Cobby</Mash2_Cobby>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
     <adminhtml>
         <layout>
             <updates>

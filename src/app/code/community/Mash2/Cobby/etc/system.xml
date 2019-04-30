@@ -221,8 +221,24 @@
                     </fields>
                 </magento>
 
-                <version>
+                <system_check module="mash2_cobby" translate="label comment">
+                    <label>System Check</label>
+                    <comment>This is a system check, if you run into problems, you can troubleshoot here</comment>
                     <sort_order>500</sort_order>
+                    <expanded>1</expanded>
+                    <show_in_default>1</show_in_default>
+                    <fields>
+                        <tests module="mash2_cobby">
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>mash2_cobby/adminhtml_system_config_systemcheck</frontend_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                        </tests>
+                    </fields>
+                </system_check>
+
+                <version>
+                    <sort_order>700</sort_order>
                     <show_in_default>1</show_in_default>
                     <expanded>1</expanded>
                     <fields>
