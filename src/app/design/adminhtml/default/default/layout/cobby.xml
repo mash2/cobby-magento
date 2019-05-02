@@ -5,4 +5,11 @@
             <block type="mash2_cobby/adminhtml_notifications" name="cobby_notifications" template="cobby/notifications.phtml" before="-"></block>
         </reference>
     </default>
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addCss">
+                <name>css/mash2/cobby/style.css</name>
+            </action>
+        </reference>
+    </adminhtml_system_config_edit>
 </layout>
