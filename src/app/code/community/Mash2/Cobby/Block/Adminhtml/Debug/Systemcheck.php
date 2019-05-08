@@ -6,6 +6,8 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     protected $phpVersion;
     protected $memory;
     protected $credentials;
+    protected $maintenance;
+
 
     public function __construct()
     {
@@ -14,6 +16,7 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
         $this->setCredentials();
         $this->setMemory();
         $this->setPhpVersion();
+        $this->setMaintenanceMode();
     }
 
     public function getMemory()
@@ -29,6 +32,11 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     public function getCredentials()
     {
         return $this->htmlBuilder($this->credentials);
+    }
+
+    public function getMaintenanceMode()
+    {
+        return $this->htmlBuilder($this->maintenance);
     }
 
     public function getIcon($section)
@@ -88,5 +96,10 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     private function setCredentials()
     {
         $this->credentials = $this->helper->checkCredentials();
+    }
+
+    private function setMaintenanceMode()
+    {
+        $this->maintenance = $this->helper->checkMaintenanceMode();
     }
 }

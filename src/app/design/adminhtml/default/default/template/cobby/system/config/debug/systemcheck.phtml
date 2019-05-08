@@ -23,6 +23,13 @@
         </td>
     </tr>
     <tr>
+        <td><?php echo $this->getIcon($this->maintenance)?></td>
+        <td><?php echo $this->__("Maintenance Mode")?></td>
+        <td>
+            <?php echo $this->getMaintenanceMode()?>
+        </td>
+    </tr>
+    <tr>
         <td><?php echo "<a target='_blank' href='https://help.cobby.io'>" . $this->__("Need help?") . "</a>" ?></td>
     </tr>
 </table>

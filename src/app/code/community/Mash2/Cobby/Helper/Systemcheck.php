@@ -11,6 +11,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
     const ERROR = 1;
     const EXCEPTION = -1;
     const MIN_MEMORY = 512;
+    const MAINTENANCE_MODE = 'maintenance.flag';
     const URL = 'https://help.cobby.io';
     const VALUE = 'value';
     const CODE = 'code';
@@ -50,6 +51,28 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
                 $$code = self::ERROR;
                 $link = self::URL;
                 $value = $this->__('Your php version is %s, it must be at least %s', $version, self::PHP_MIN_VERSION);
+            }
+        } catch (Exception $e) {
+            $code = self::EXCEPTION;
+            $value = $e->getMessage();
+            $link = self::URL;
+        }
+
+        return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
+    }
+
+    public function checkMaintenanceMode()
+    {
+        $value = $this->__('Maintenance mode is not active');
+        $code = self::OK;
+        $link = '';
+
+        try {
+            $maintenanceOn = file_exists($_ENV['PWD'] . '/' . self::MAINTENANCE_MODE);
+            if ($maintenanceOn) {
+                $value = $this->__('Maintenance mode is active');
+                $code = self::ERROR;
+                $link = self::URL;
             }
         } catch (Exception $e) {
             $code = self::EXCEPTION;
