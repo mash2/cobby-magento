@@ -17,6 +17,14 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
     const CODE = 'code';
     const LINK = 'link';
 
+    private $indexMap = array(
+        'catalog_category_product' => 'Category Products',
+        'catalog_product_price' => 'Product Prices',
+        'cataloginventory_stock' => 'Stock Status',
+        'catalog_product_flat' => 'Product Flat Data',
+        'catalog_category_flat' => 'Category Flat Data'
+    );
+
     public function checkMemory()
     {
         $value = $this->__('You have enough memory');
@@ -77,6 +85,32 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $code = self::EXCEPTION;
             $value = $e->getMessage();
+            $link = self::URL;
+        }
+
+        return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
+    }
+
+    public function checkIndexerStatus()
+    {
+        $value = $this->__('No indices are running');
+        $code = self::OK;
+        $link = '';
+
+        $running = array();
+
+        $indexer = Mage::getModel('mash2_cobby/indexer_api');
+        $indices = $indexer->export();
+
+        foreach ($indices as $index) {
+            if (key_exists($index['code'], $this->indexMap) && $index['status'] == 'working') {
+                $running[] = $index['code'];
+            }
+        }
+
+        if (!empty($running)) {
+            $value = $this->__('Indices are running. Indices: ') . implode('; ', $running);
+            $code = self::ERROR;
             $link = self::URL;
         }
 
