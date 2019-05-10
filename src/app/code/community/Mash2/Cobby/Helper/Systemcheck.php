@@ -123,12 +123,12 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $code = self::OK;
         $link = '';
 
-        $adminUrl = Mage::helper('mash2_cobby/settings')->getDefaultBaseUrl();
-        $dbUrl = Mage::helper('mash2_cobby/settings')->getCobbyUrl();
+        $baseUrl = Mage::helper('mash2_cobby/settings')->getDefaultBaseUrl();
+        $cobbyUrl = Mage::helper('mash2_cobby/settings')->getCobbyUrl();
 
-        $len = strlen($dbUrl);
+        $len = strlen($cobbyUrl);
 
-        if (substr($adminUrl, 0, $len) !== $dbUrl) {
+        if (substr($baseUrl, 0, $len) !== $cobbyUrl) {
             $value = 'Your cobby url does not match the shop url, you need to save config or disable cobby';
             $code = self::ERROR;
             $link = self::URL;
