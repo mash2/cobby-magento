@@ -119,7 +119,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkUrl()
     {
-        $value = 'Your url is up to date';
+        $value = $this->__('Your url is up to date');
         $code = self::OK;
         $link = '';
 
@@ -129,7 +129,24 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $len = strlen($cobbyUrl);
 
         if (substr($baseUrl, 0, $len) !== $cobbyUrl) {
-            $value = 'Your cobby url does not match the shop url, you need to save config or disable cobby';
+            $value = $this->__('Your cobby url does not match the shop url, you need to save config or disable cobby');
+            $code = self::ERROR;
+            $link = self::URL;
+        }
+
+        return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
+    }
+
+    public function checkCobbyActive()
+    {
+        $value = $this->__('Cobby is active');
+        $code = self::OK;
+        $link = '';
+
+        $active = Mage::getStoreConfigFlag('cobby/settings/active');
+
+        if (!$active) {
+            $value = $this->__('Cobby must be enabled to work as expected');
             $code = self::ERROR;
             $link = self::URL;
         }
