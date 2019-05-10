@@ -8,8 +8,7 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     protected $credentials;
     protected $maintenance;
     protected $indexer;
-
-
+    protected $url;
 
     public function __construct()
     {
@@ -20,6 +19,7 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
         $this->setPhpVersion();
         $this->setMaintenanceMode();
         $this->setIndexerStatus();
+        $this->setUrl();
     }
 
     public function getMemory()
@@ -45,6 +45,11 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     public function getIndexerStatus()
     {
         return $this->htmlBuilder($this->indexer);
+    }
+
+    public function getUrlCheck()
+    {
+        return $this->htmlBuilder($this->url);
     }
 
     public function getIcon($section)
@@ -114,5 +119,10 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     private function setIndexerStatus()
     {
         $this->indexer = $this->helper->checkIndexerStatus();
+    }
+
+    private function setUrl()
+    {
+        $this->url = $this->helper->checkUrl();
     }
 }

@@ -94,6 +94,8 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
         if ($this->settings->getCobbyActive()) {
             $result = $this->cobbyApi->registerShop($apiUserName, $apiKey);
 
+            $this->settings->setCobbyUrl($this->settings->getDefaultBaseUrl());
+
             Mage::getSingleton('index/indexer')
                 ->getProcessByCode('cobby_sync')
                 ->changeStatus(Mage_Index_Model_Process::STATUS_RUNNING);

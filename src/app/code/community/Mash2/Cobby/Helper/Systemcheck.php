@@ -117,6 +117,26 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
     }
 
+    public function checkUrl()
+    {
+        $value = 'Your url is up to date';
+        $code = self::OK;
+        $link = '';
+
+        $adminUrl = Mage::helper('mash2_cobby/settings')->getDefaultBaseUrl();
+        $dbUrl = Mage::helper('mash2_cobby/settings')->getCobbyUrl();
+
+        $len = strlen($dbUrl);
+
+        if (substr($adminUrl, 0, $len) !== $dbUrl) {
+            $value = 'Your cobby url does not match the shop url, you need to save config or disable cobby';
+            $code = self::ERROR;
+            $link = self::URL;
+        }
+
+        return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
+    }
+
     private function getApiUrl()
     {
         $baseUrl = '';

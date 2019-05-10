@@ -17,6 +17,7 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     const XML_PATH_COBBY_PRODUCT_QUANTITY               = 'cobby/stock/quantity';
     const XML_PATH_COBBY_STOCK_AVAILABILITY             = 'cobby/stock/availability';
     const XML_PATH_COBBY_SETTINGS_ACTIVE                = 'cobby/settings/active';
+    const XML_PATH_COBBY_URL                            = 'cobby/settings/base_url';
     const MANAGE_STOCK_ENABLED                          = 0;
     const MANAGE_STOCK_READONLY                         = 1;
     const MANAGE_STOCK_DISABLED                         = 2;
@@ -107,9 +108,20 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
         }
     }
 
+    public function getCobbyUrl()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_COBBY_URL);
+    }
+
+    public function setCobbyUrl($url)
+    {
+        Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_URL, $url);
+    }
+
     public function setCobbyActive($value)
     {
         Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_SETTINGS_ACTIVE, $value);
+
         return true;
     }
 
