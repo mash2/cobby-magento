@@ -17,7 +17,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
     const CODE = 'code';
     const LINK = 'link';
 
-    private $indexMap = array(
+    private $relevantIndexers = array(
         'catalog_category_product' => 'Category Products',
         'catalog_product_price' => 'Product Prices',
         'cataloginventory_stock' => 'Stock Status',
@@ -93,23 +93,23 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkIndexerStatus()
     {
-        $value = $this->__('No indices are running');
+        $value = $this->__('No indexers are running');
         $code = self::OK;
         $link = '';
 
-        $running = array();
+        $runningIndexers = array();
 
-        $indexer = Mage::getModel('mash2_cobby/indexer_api');
-        $indices = $indexer->export();
+        $indexerModel = Mage::getModel('mash2_cobby/indexer_api');
+        $indexers = $indexerModel->export();
 
-        foreach ($indices as $index) {
-            if (key_exists($index['code'], $this->indexMap) && $index['status'] == 'working') {
-                $running[] = $index['code'];
+        foreach ($indexers as $indexer) {
+            if (key_exists($indexer['code'], $this->relevantIndexers) && $indexer['status'] == 'working') {
+                $runningIndexers[] = $indexer['code'];
             }
         }
 
-        if (!empty($running)) {
-            $value = $this->__('Indices are running. Indices: ') . implode('; ', $running);
+        if (!empty($runningIndexers)) {
+            $value = $this->__('Indexers are running. Indexers: ') . implode('; ', $runningIndexers);
             $code = self::ERROR;
             $link = self::URL;
         }
@@ -147,6 +147,24 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
         if (!$active) {
             $value = $this->__('Cobby must be enabled to work as expected');
+            $code = self::ERROR;
+            $link = self::URL;
+        }
+
+        return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
+    }
+
+    public function checkCobbyVersion()
+    {
+        $code = self::OK;
+        $value = $this->__('Your module version is synchronized');
+        $link = '';
+
+        $moduleVersion = Mage::getConfig()->getNode('modules/Mash2_Cobby/version')->asArray();
+        $cobbyVersion = Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_DBVERSION );
+
+        if ($cobbyVersion != $moduleVersion) {
+            $value = $this->__('Your module version is not synchronized, you must save the configuration for synchronization.');
             $code = self::ERROR;
             $link = self::URL;
         }

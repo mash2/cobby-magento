@@ -103,6 +103,8 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
             Mage::getSingleton('core/session')->addSuccess(Mage::helper('mash2_cobby')->__(self::SUCCESS_MESSAGE));
         }
 
+        $this->settings->setCobbyVersion(Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_VERSION));
+
         return $this;
     }
 

@@ -8,6 +8,7 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     const XML_PATH_PRODUCT_CATEGORY_POSITION            = 'cobby/settings/product_category_position';
     const XML_PATH_LICENSE_KEY                          = 'cobby/settings/license_key';
     const XML_PATH_COBBY_VERSION                        = 'cobby/settings/cobby_version';
+    const XML_PATH_COBBY_DBVERSION                      = 'cobby/settings/cobby_dbversion';
     const XML_PATH_COBBY_HTACCESS_PASSWORD              = 'cobby/htaccess/password';
     const XML_PATH_COBBY_HTACCESS_USER                  = 'cobby/htaccess/user';
     const XML_PATH_COBBY_SETTINGS_CONTACT_EMAIL         = 'cobby/settings/contact_email';
@@ -93,6 +94,11 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     public function getCobbyVersion()
     {
         return Mage::getStoreConfig(self::XML_PATH_COBBY_VERSION);
+    }
+
+    public function setCobbyVersion($url)
+    {
+        Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_DBVERSION, $url, 'default', 0);
     }
 
     public function isCobbyEnabled()
