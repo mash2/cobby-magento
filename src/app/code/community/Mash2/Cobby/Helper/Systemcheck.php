@@ -25,6 +25,22 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         'catalog_category_flat' => 'Category Flat Data'
     );
 
+    public function getReport()
+    {
+        $result = array(
+            'phpversion' => $this->checkPhpVersion(),
+            'memory' => $this->checkMemory(),
+            'credentials' => $this->checkCredentials(),
+            'maintenance' => $this->checkMaintenanceMode(),
+            'indexer' => $this->checkIndexerStatus(),
+            'url' => $this->checkUrl(),
+            'cobby_active' => $this->checkCobbyActive(),
+            'cobby_version' => $this->checkPhpVersion()
+        );
+
+        return $result;
+    }
+
     public function checkMemory()
     {
         $value = $this->__('You have enough memory');

@@ -23,10 +23,12 @@ class Mash2_Cobby_Model_Core_Config_Api extends Mage_Api_Model_Resource_Abstract
     );
 
     private $settings;
+    private $systemCheck;
 
     public function __construct()
     {
         $this->settings = Mage::helper('mash2_cobby/settings');
+        $this->systemCheck = Mage::helper('mash2_cobby/systemcheck');
     }
 
     /**
@@ -85,5 +87,12 @@ class Mash2_Cobby_Model_Core_Config_Api extends Mage_Api_Model_Resource_Abstract
         $this->settings->setCobbyActive($value);
 
         return $data;
+    }
+
+    public function report()
+    {
+        $result= $this->systemCheck->getReport();
+
+        return $result;
     }
 }

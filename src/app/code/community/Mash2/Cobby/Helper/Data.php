@@ -27,8 +27,8 @@ class Mash2_Cobby_Helper_Data extends Mage_Core_Helper_Abstract
         $newAcl = Mage::getModel('api/rules');
         $newAcl->setResourceId('cobby')
             ->setRoleType(Mage_Api_Model_Acl::ROLE_TYPE_GROUP)
-            ->setPermission('allow') // 1.5
-			->setApiPermission('allow'); // > 1.5
+            ->setPermission('allow')// 1.5
+            ->setApiPermission('allow'); // > 1.5
 
         $newRole = Mage::getModel('api/role');
         $newRole->setRoleName(self::COBBY_ROLE_NAME)

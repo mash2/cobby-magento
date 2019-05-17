@@ -102,6 +102,7 @@
                 <methods>
                     <export translate="title" module="mash2_cobby"/>
                     <active translate="title" module="mash2_cobby"/>
+                    <report translate="title" module="mash2_cobby"/>
                 </methods>
             </cobby_core_config>
 
