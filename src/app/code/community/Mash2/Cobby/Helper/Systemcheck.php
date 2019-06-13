@@ -43,7 +43,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkMemory()
     {
-        $value = $this->__('You have enough memory');
+        $value = $this->__('Memory ok');
         $code = self::OK;
         $link = '';
 
@@ -51,7 +51,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
             $memory = ini_get('memory_limit');
             if ((int)$memory < self::MIN_MEMORY) {
                 $code = self::ERROR;
-                $value = $this->__('Your memory is %sB, it has to be at least %sMB', $memory, self::MIN_MEMORY);
+                $value = $this->__('Memory is %sB, it has to be at least %sMB', $memory, self::MIN_MEMORY);
                 $link = self::URL;
             }
         } catch (Exception $e) {
@@ -65,7 +65,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkPhpVersion()
     {
-        $value = $this->__('Your php version is ok');
+        $value = $this->__('PHP version ok');
         $code = self::OK;
         $link = '';
 
@@ -74,7 +74,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
             if (version_compare($version, self::PHP_MIN_VERSION, '<')) {
                 $$code = self::ERROR;
                 $link = self::URL;
-                $value = $this->__('Your php version is %s, it must be at least %s', $version, self::PHP_MIN_VERSION);
+                $value = $this->__('PHP version is %s, it must be at least %s', $version, self::PHP_MIN_VERSION);
             }
         } catch (Exception $e) {
             $code = self::EXCEPTION;
@@ -87,14 +87,14 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkMaintenanceMode()
     {
-        $value = $this->__('Maintenance mode is not active');
+        $value = $this->__('Is not active');
         $code = self::OK;
         $link = '';
 
         try {
             $maintenanceOn = file_exists($_ENV['PWD'] . '/' . self::MAINTENANCE_MODE);
             if ($maintenanceOn) {
-                $value = $this->__('Maintenance mode is active');
+                $value = $this->__('Is active');
                 $code = self::ERROR;
                 $link = self::URL;
             }
@@ -109,7 +109,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkIndexerStatus()
     {
-        $value = $this->__('No indexers are running');
+        $value = $this->__('Index is valid');
         $code = self::OK;
         $link = '';
 
@@ -125,7 +125,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         }
 
         if (!empty($runningIndexers)) {
-            $value = $this->__('Indexers are running. Indexers: ') . implode('; ', $runningIndexers);
+            $value = $this->__('Indexing is in progress for: ') . implode('; ', $runningIndexers);
             $code = self::ERROR;
             $link = self::URL;
         }
@@ -135,7 +135,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     public function checkUrl()
     {
-        $value = $this->__('Your url is up to date');
+        $value = $this->__('URL is up to date');
         $code = self::OK;
         $link = '';
 
@@ -145,7 +145,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $len = strlen($cobbyUrl);
 
         if (substr($baseUrl, 0, $len) !== $cobbyUrl) {
-            $value = $this->__('Your cobby url does not match the shop url, you need to save config or disable cobby');
+            $value = $this->__('The cobby URL doesn’t match the base URL, save config or disable cobby');
             $code = self::ERROR;
             $link = self::URL;
         }
@@ -162,7 +162,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $active = Mage::getStoreConfigFlag('cobby/settings/active');
 
         if (!$active) {
-            $value = $this->__('Cobby must be enabled to work as expected');
+            $value = $this->__('Cobby must be activated to work as expected');
             $code = self::ERROR;
             $link = self::URL;
         }
@@ -180,7 +180,7 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $cobbyVersion = Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_DBVERSION );
 
         if ($cobbyVersion != $moduleVersion) {
-            $value = $this->__('Your module version is not synchronized, you must save the configuration for synchronization.');
+            $value = $this->__('Your module version is not synchronized, save config for synchronization');
             $code = self::ERROR;
             $link = self::URL;
         }
@@ -232,12 +232,12 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
             $login = $this->_login($url, $data);
             if (!$login) {
                 $code = self::ERROR;
-                $value = $this->__('It seems like your login data is incorrect, check your credentials');
+                $value = $this->__('It seems the provided credentials are wrong');
                 $link = self::URL;
             }
         } else {
             $code = self::EXCEPTION;
-            $value = $this->__('It seems like you have no login data, enter your credentials and hit "Save Config"');
+            $value = $this->__('It seems like you have no login data, enter your credentials and save config');
             $link = self::URL;
         }
 
