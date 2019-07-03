@@ -144,9 +144,13 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
         $len = strlen($cobbyUrl);
 
-        if (substr($baseUrl, 0, $len) !== $cobbyUrl) {
+        if (substr($baseUrl, 0, $len) !== $cobbyUrl && !empty($cobbyUrl)) {
             $value = $this->__('The cobby URL doesn’t match the base URL, save config or disable cobby');
             $code = self::ERROR;
+            $link = self::URL;
+        } else if (empty($cobbyUrl)){
+            $value = $this->__("The URL can't be checked, save config");
+            $code = self::EXCEPTION;
             $link = self::URL;
         }
 
@@ -206,17 +210,22 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 
     protected function _getLoginData()
     {
+        $result = false;
+
         $apiUserName = Mage::helper('mash2_cobby/settings')->getApiUser();
         $apiKey = Mage::helper('core')->decrypt(Mage::getStoreConfig('cobby/settings/api_key'));
 
+        if (!empty($apiUserName)) {
+            $data = array(
+                "method" => "login",
+                "params" => array($apiUserName, $apiKey),
+                "id" => "id"
+            );
 
-        $data = array(
-            "method" => "login",
-            "params" => array($apiUserName, $apiKey),
-            "id" => "id"
-        );
+            $result = json_encode($data);
+        }
 
-        return json_encode($data);
+        return $result;
     }
 
     public function checkCredentials()
