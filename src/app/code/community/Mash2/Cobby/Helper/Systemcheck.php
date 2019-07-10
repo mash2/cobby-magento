@@ -6,7 +6,6 @@
 class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
 {
     const PHP_MIN_VERSION = "5.6";
-    const API_ROUTE = 'index.php/api/mash2/json';
     const OK = 0;
     const ERROR = 1;
     const EXCEPTION = -1;
@@ -192,22 +191,6 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
     }
 
-    private function getApiUrl()
-    {
-        $baseUrl = '';
-        $defaultGroup = Mage::app()->getWebsite(true)->getDefaultGroup();
-        if ($defaultGroup) {
-            $defaultStore = $defaultGroup->getDefaultStore();
-            if ($defaultStore) {
-                $baseUrl = $defaultStore->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
-            }
-        }
-
-        $url = explode(':', $baseUrl);
-
-        return $url[0] . ':' . $url[1] . '/' . self::API_ROUTE;
-    }
-
     protected function _getLoginData()
     {
         $result = false;
@@ -215,14 +198,9 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $apiUserName = Mage::helper('mash2_cobby/settings')->getApiUser();
         $apiKey = Mage::helper('core')->decrypt(Mage::getStoreConfig('cobby/settings/api_key'));
 
-        if (!empty($apiUserName)) {
-            $data = array(
-                "method" => "login",
-                "params" => array($apiUserName, $apiKey),
-                "id" => "id"
-            );
 
-            $result = json_encode($data);
+        if (!empty($apiUserName)) {
+            $result = array('username' => $apiUserName, 'password' => $apiKey);
         }
 
         return $result;
@@ -234,61 +212,23 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $code = self::OK;
         $link = '';
 
-        $url = $this->getApiUrl();
         $data = $this->_getLoginData();
 
-        if ($data) {
-            $login = $this->_login($url, $data);
-            if (!$login) {
+        if (empty($data)) {
+            $code = self::EXCEPTION;
+            $value = $this->__('It seems like you have no login data, enter your credentials and save config');
+            $link = self::URL;
+        } else {
+            $session = Mage::getSingleton('mash2_cobby/admin_session');
+            $auth = $session->login($data['username'], $data['password']);
+
+            if (!$auth->getId()) {
                 $code = self::ERROR;
                 $value = $this->__('It seems the provided credentials are wrong');
                 $link = self::URL;
             }
-        } else {
-            $code = self::EXCEPTION;
-            $value = $this->__('It seems like you have no login data, enter your credentials and save config');
-            $link = self::URL;
         }
 
         return array(self::VALUE => $value, self::CODE => $code, self::LINK => $link);
-    }
-
-    protected function _login($url, $data)
-    {
-        if (strpos($url, 'http') === 0 && strpos($url, '://') !== false) {
-            try {
-
-                $curl = new Varien_Http_Adapter_Curl();
-                $curl->setConfig(array(
-                    'timeout'   => 15    //Timeout in no of seconds
-                ));
-
-                $curl->write(Zend_Http_Client::POST, $url, '1.1', array(), $data);
-                $response = $curl->read();
-
-                $http_code = $curl->getInfo(CURLINFO_HTTP_CODE);
-                $header_size = $curl->getInfo(CURLINFO_HEADER_SIZE);
-
-                $body = json_decode(substr($response, $header_size));
-                $token = $body->result;
-
-                $curl->close();
-
-                if ($http_code !== 200) {
-                    Mage::throwException("Http code: " .$http_code);
-                }
-
-                if ($token) {
-                    return true;
-                }
-
-                return false;
-            } catch (Exception $e) {
-
-                return  false;
-            }
-        }
-
-        return false;
     }
 }
