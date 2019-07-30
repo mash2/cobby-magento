@@ -1,6 +1,6 @@
 <?php
 
-class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block_Widget_Form
+class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block_Abstract
 {
     private $helper;
     protected $phpVersion;
@@ -12,9 +12,11 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     protected $cobbyActive;
     protected $cobbyVersion;
 
+    protected $_template = 'cobby/system/config/debug/systemcheck.phtml';
+
     public function __construct()
     {
-        $this->setTemplate('cobby/system/config/debug/systemcheck.phtml');
+        parent::__construct();
         $this->helper = Mage::helper('mash2_cobby/systemcheck');
         $this->setCredentials();
         $this->setMemory();

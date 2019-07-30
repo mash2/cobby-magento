@@ -219,12 +219,12 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
             $value = $this->__('It seems like you have no login data, enter your credentials and save config');
             $link = self::URL;
         } else {
-            $session = Mage::getSingleton('mash2_cobby/admin_session');
-            $auth = $session->login($data['username'], $data['password']);
-
-            if (!$auth->getId()) {
+            $session = Mage::getSingleton('api/session');
+            try {
+                $auth = $session->login($data['username'], $data['password']);
+            } catch (Exception $e) {
                 $code = self::ERROR;
-                $value = $this->__('It seems the provided credentials are wrong');
+                $value = $e->getMessage();
                 $link = self::URL;
             }
         }
