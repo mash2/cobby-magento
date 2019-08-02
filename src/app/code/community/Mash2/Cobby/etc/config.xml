@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Mash2_Cobby>
-            <version>1.48.1.1</version>
+            <version>1.49.1.1</version>
         </Mash2_Cobby>
     </modules>
     <global>
@@ -62,6 +62,15 @@
                     </Mash2_Cobby>
                 </observers>
             </admin_system_config_changed_section_cobby>
+
+            <model_config_data_save_before>
+                <observers>
+                    <Mash2_Cobby>
+                        <class>mash2_cobby/observer</class>
+                        <method>saveCobbyConfigData</method>
+                    </Mash2_Cobby>
+                </observers>
+            </model_config_data_save_before>
 
             <catalog_category_delete_after>
                 <observers>
@@ -343,7 +352,7 @@
                 <license_key>cobby license key</license_key>
                 <overwrite_images>0</overwrite_images>
                 <new_api_user>cobby.api</new_api_user>
-                <cobby_version>1.48.1.1</cobby_version>
+                <cobby_version>1.49.1.1</cobby_version>
                 <product_category_position>1</product_category_position>
             </settings>
             <stock>

@@ -1,19 +1,31 @@
 <?php
 
-class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block_Widget_Form
+class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block_Abstract
 {
     private $helper;
     protected $phpVersion;
     protected $memory;
     protected $credentials;
+    protected $maintenance;
+    protected $indexer;
+    protected $url;
+    protected $cobbyActive;
+    protected $cobbyVersion;
+
+    protected $_template = 'cobby/system/config/debug/systemcheck.phtml';
 
     public function __construct()
     {
-        $this->setTemplate('cobby/system/config/debug/systemcheck.phtml');
+        parent::__construct();
         $this->helper = Mage::helper('mash2_cobby/systemcheck');
         $this->setCredentials();
         $this->setMemory();
         $this->setPhpVersion();
+        $this->setMaintenanceMode();
+        $this->setIndexerStatus();
+        $this->setUrl();
+        $this->setCobbyActive();
+        $this->setCobbyVersion();
     }
 
     public function getMemory()
@@ -29,6 +41,34 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     public function getCredentials()
     {
         return $this->htmlBuilder($this->credentials);
+    }
+
+    public function getMaintenanceMode()
+    {
+        return $this->htmlBuilder($this->maintenance);
+    }
+
+    public function getIndexerStatus()
+    {
+        return $this->htmlBuilder($this->indexer);
+    }
+
+    public function getUrlCheck()
+    {
+        return $this->htmlBuilder($this->url);
+    }
+
+    public function getCobbyActive()
+    {
+        return $this->htmlBuilder($this->cobbyActive);
+    }
+
+    /**
+    * @return mixed
+    */
+    public function getCobbyVersion()
+    {
+        return $this->htmlBuilder($this->cobbyVersion);
     }
 
     public function getIcon($section)
@@ -88,5 +128,30 @@ class Mash2_Cobby_Block_Adminhtml_Debug_Systemcheck extends Mage_Adminhtml_Block
     private function setCredentials()
     {
         $this->credentials = $this->helper->checkCredentials();
+    }
+
+    private function setMaintenanceMode()
+    {
+        $this->maintenance = $this->helper->checkMaintenanceMode();
+    }
+
+    private function setIndexerStatus()
+    {
+        $this->indexer = $this->helper->checkIndexerStatus();
+    }
+
+    private function setUrl()
+    {
+        $this->url = $this->helper->checkUrl();
+    }
+
+    private function setCobbyActive()
+    {
+        $this->cobbyActive = $this->helper->checkCobbyActive();
+    }
+
+    private function setCobbyVersion()
+    {
+        $this->cobbyVersion = $this->helper->checkCobbyVersion();
     }
 }

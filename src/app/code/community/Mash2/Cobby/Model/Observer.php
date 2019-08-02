@@ -105,6 +105,23 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
     }
 
     /**
+     * store custom cobby settings
+     * @param $observer
+     * @return Mash2_Cobby_Model_Observer
+     */
+    public function saveCobbyConfigData($observer)
+    {
+        $config = $observer->getObject();
+        if($config->getSection() == "cobby") {
+
+            $this->settings->setCobbyVersion(Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_VERSION));
+            $this->settings->setCobbyUrl($this->settings->getDefaultBaseUrl());
+        }
+
+        return $this;
+    }
+
+        /**
      * run index for category deleted event
      * because the category delete event is not processed in indexer
      *
@@ -181,9 +198,9 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
             ->enqueueAndNotify($entity, self::SAVE, $object->getId());
     }
 
-    private function _triggerSetReindexCobbyRequired()
+    private function _triggerSetReindexCobbyRequired($msg)
     {
-        Mage::getModel('mash2_cobby/product')->resetHash('store_changed');
+        Mage::getModel('mash2_cobby/product')->resetHash($msg);
 
         Mage::getSingleton('index/indexer')
             ->getProcessByCode('cobby_sync')
@@ -284,32 +301,32 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
 
     public function storeSaveAfter($observer)
     {
-        $this->_triggerSetReindexCobbyRequired();
+        $this->_triggerSetReindexCobbyRequired('store_changed');
     }
 
     public function storeDeleteAfter($observer)
     {
-        $this->_triggerSetReindexCobbyRequired();
+        $this->_triggerSetReindexCobbyRequired('store_changed');
     }
 
     public function storeGroupSaveAfter($observer)
     {
-        $this->_triggerSetReindexCobbyRequired();
+        $this->_triggerSetReindexCobbyRequired('store_changed');
     }
 
     public function storeGroupDeleteAfter($observer)
     {
-        $this->_triggerSetReindexCobbyRequired();
+        $this->_triggerSetReindexCobbyRequired('store_changed');
     }
 
     public function websiteSaveAfter($observer)
     {
-        Mage::getModel('mash2_cobby/product')->resetHash('website_changed');
+        $this->_triggerSetReindexCobbyRequired('website_changed');
     }
 
     public function websiteDeleteAfter($observer)
     {
-        Mage::getModel('mash2_cobby/product')->resetHash('website_changed');
+        $this->_triggerSetReindexCobbyRequired('website_changed');
     }
 
     /**

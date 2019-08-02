@@ -8,6 +8,7 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     const XML_PATH_PRODUCT_CATEGORY_POSITION            = 'cobby/settings/product_category_position';
     const XML_PATH_LICENSE_KEY                          = 'cobby/settings/license_key';
     const XML_PATH_COBBY_VERSION                        = 'cobby/settings/cobby_version';
+    const XML_PATH_COBBY_DBVERSION                      = 'cobby/settings/cobby_dbversion';
     const XML_PATH_COBBY_HTACCESS_PASSWORD              = 'cobby/htaccess/password';
     const XML_PATH_COBBY_HTACCESS_USER                  = 'cobby/htaccess/user';
     const XML_PATH_COBBY_SETTINGS_CONTACT_EMAIL         = 'cobby/settings/contact_email';
@@ -17,6 +18,7 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
     const XML_PATH_COBBY_PRODUCT_QUANTITY               = 'cobby/stock/quantity';
     const XML_PATH_COBBY_STOCK_AVAILABILITY             = 'cobby/stock/availability';
     const XML_PATH_COBBY_SETTINGS_ACTIVE                = 'cobby/settings/active';
+    const XML_PATH_COBBY_URL                            = 'cobby/settings/base_url';
     const MANAGE_STOCK_ENABLED                          = 0;
     const MANAGE_STOCK_READONLY                         = 1;
     const MANAGE_STOCK_DISABLED                         = 2;
@@ -94,6 +96,11 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig(self::XML_PATH_COBBY_VERSION);
     }
 
+    public function setCobbyVersion($url)
+    {
+        Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_DBVERSION, $url, 'default', 0);
+    }
+
     public function isCobbyEnabled()
     {
         $enabled = $this->getCobbyActive();
@@ -107,9 +114,20 @@ class Mash2_Cobby_Helper_Settings extends Mage_Core_Helper_Abstract
         }
     }
 
+    public function getCobbyUrl()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_COBBY_URL);
+    }
+
+    public function setCobbyUrl($url)
+    {
+        Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_URL, $url);
+    }
+
     public function setCobbyActive($value)
     {
         Mage::getConfig()->saveConfig(self::XML_PATH_COBBY_SETTINGS_ACTIVE, $value);
+
         return true;
     }
 
