@@ -89,9 +89,10 @@ class Mash2_Cobby_Helper_Systemcheck extends Mage_Core_Helper_Abstract
         $value = $this->__('Is not active');
         $code = self::OK;
         $link = '';
+        $maintenanceFlagFilePath = Mage::getBaseDir() . DS . self::MAINTENANCE_MODE;
 
         try {
-            $maintenanceOn = file_exists($_ENV['PWD'] . '/' . self::MAINTENANCE_MODE);
+            $maintenanceOn = file_exists($maintenanceFlagFilePath );
             if ($maintenanceOn) {
                 $value = $this->__('Is active');
                 $code = self::ERROR;
