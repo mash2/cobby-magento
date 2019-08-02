@@ -63,6 +63,15 @@
                 </observers>
             </admin_system_config_changed_section_cobby>
 
+            <model_config_data_save_before>
+                <observers>
+                    <Mash2_Cobby>
+                        <class>mash2_cobby/observer</class>
+                        <method>saveCobbyConfigData</method>
+                    </Mash2_Cobby>
+                </observers>
+            </model_config_data_save_before>
+
             <catalog_category_delete_after>
                 <observers>
                     <mash2_cobby>

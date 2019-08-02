@@ -94,8 +94,6 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
         if ($this->settings->getCobbyActive()) {
             $result = $this->cobbyApi->registerShop($apiUserName, $apiKey);
 
-            $this->settings->setCobbyUrl($this->settings->getDefaultBaseUrl());
-
             Mage::getSingleton('index/indexer')
                 ->getProcessByCode('cobby_sync')
                 ->changeStatus(Mage_Index_Model_Process::STATUS_RUNNING);
@@ -103,12 +101,27 @@ class Mash2_Cobby_Model_Observer extends Mage_Core_Model_Abstract
             Mage::getSingleton('core/session')->addSuccess(Mage::helper('mash2_cobby')->__(self::SUCCESS_MESSAGE));
         }
 
-        $this->settings->setCobbyVersion(Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_VERSION));
-
         return $this;
     }
 
     /**
+     * store custom cobby settings
+     * @param $observer
+     * @return Mash2_Cobby_Model_Observer
+     */
+    public function saveCobbyConfigData($observer)
+    {
+        $config = $observer->getObject();
+        if($config->getSection() == "cobby") {
+
+            $this->settings->setCobbyVersion(Mage::getStoreConfig(Mash2_Cobby_Helper_Settings::XML_PATH_COBBY_VERSION));
+            $this->settings->setCobbyUrl($this->settings->getDefaultBaseUrl());
+        }
+
+        return $this;
+    }
+
+        /**
      * run index for category deleted event
      * because the category delete event is not processed in indexer
      *
