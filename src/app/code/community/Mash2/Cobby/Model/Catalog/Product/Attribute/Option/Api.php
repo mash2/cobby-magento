@@ -32,13 +32,13 @@ class Mash2_Cobby_Model_Catalog_Product_Attribute_Option_Api extends Mage_Catalo
     {
         Mage::register('is_cobby_import', 1);
         $result = array();
-        $model = Mage::getModel('catalog/resource_eav_attribute')
-            ->setEntityTypeId(
-                Mage::getModel('eav/entity')->setType('catalog_product')->getTypeId()
-            );
 
         foreach ($rows as $row) {
             $attributeId = $row['attribute_id'];
+            $model = Mage::getModel('catalog/resource_eav_attribute')
+                ->setEntityTypeId(
+                    Mage::getModel('eav/entity')->setType('catalog_product')->getTypeId()
+                );
             $attribute = $model->load($attributeId);
 
             if (!$attribute->getId()) {
