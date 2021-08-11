@@ -38,6 +38,8 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
 
     public function importProducts($data, $typeModels, $usedSkus, $transactionId)
     {
+        $result = array();
+
         if (!is_null($typeModels) && !is_array($typeModels)) {
             $typeModels = array($typeModels);
         }
@@ -62,27 +64,32 @@ class Mash2_Cobby_Model_Import_Product_Api extends Mage_Api_Model_Resource_Abstr
 
         if ($importModel->getProcessedRowsCount() > 0) {
             if (!$validationResult) {
-                Mage::throwException($this->_getErrorMessage($importModel));
+                foreach ($this->_getErrorMessage($importModel) as $sku => $errors) {
+                    $product = array('sku' => $sku, 'errors' => $errors);
+                    $result[] = $product;
+                }
+            } else {
+                $importModel->importData();
+                Mage::dispatchEvent('cobby_import_product_import_after', array('transport' => $transportObject));
+                foreach ($importModel->getProcessedProducts() as $sku => $item) {
+                    $product = $item;
+                    $product['sku'] = $sku;
+                    $product['errors'] = array();
+                    $result[] = $product;
+                }
             }
-
-            $importModel->importData();
-
-            Mage::dispatchEvent('cobby_import_product_import_after', array('transport' => $transportObject));
-            return $importModel->getProcessedProducts();
         }
 
-        return array();
+        return $result;
     }
 
+    /**
+     * @param $importModel
+     * @return string
+     */
     private function _getErrorMessage($importModel)
     {
-        $message =  'Input Data contains ' . $importModel->getInvalidRowsCount();
-        $message .=  ' corrupt records (from a total of ' . $importModel->getProcessedRowsCount(). ')';
-
-        foreach ($importModel->getErrorMessages() as $type => $lines) {
-            $message .= "\n:::: " . $type . " ::::\nIn Line(s) " . implode(", ", $lines) . "\n";
-        }
-        return $message;
+        return $importModel->getErrorMessages();
     }
 
     public function updateGroupedProductAssociations($data)

@@ -131,7 +131,6 @@ class Mash2_Cobby_Model_Import_Product_Configurable extends Mash2_Cobby_Model_Im
 
         $productsSuperData = array();
         $usedAssociatedIds = array();
-
         $productIds = array_keys($rows);
 
         Mage::dispatchEvent('cobby_import_product_configurable_import_before', array( 'products' => $productIds ));
@@ -173,7 +172,7 @@ class Mash2_Cobby_Model_Import_Product_Configurable extends Mash2_Cobby_Model_Im
             'relation'   => array()
         );
 
-        $nextAttrId      = $this->resourceHelper->getNextAutoincrement($mainTable);
+        $nextAttrId      = $this->resourceHelper->getNextAutoincrement($mainTable, 'product_super_attribute_id');
 
         foreach($validProductsSuperData as $validProductSuperData)
         {

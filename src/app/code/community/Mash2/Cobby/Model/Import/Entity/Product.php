@@ -1,17 +1,7 @@
 <?php
 /*
- * Copyright 2013 mash2 GbR http://www.mash2.com
- *
- * ATTRIBUTION NOTICE
- * Parts of this work are adapted from Andreas von Studnitz
- * Original title AvS_FastSimpleImport
- * The work can be found https://github.com/avstudnitz/AvS_FastSimpleImport
- *
- * ORIGINAL COPYRIGHT INFO
- *
- * category   AvS
- * package    AvS_FastSimpleImport
- * author     Andreas von Studnitz <avs@avs-webentwicklung.de>
+ * @copyright Copyright (c) 2021 mash2 GmbH & Co. KG. All rights reserved.
+ * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0).
  */
 
 
@@ -581,9 +571,8 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
                 $valid = true;
                 break;
         }
-
         if (!$valid) {
-            $this->addRowError(Mage::helper('importexport')->__("Invalid value for '%s'") . '. ' . $message, $rowNum, $attrCode);
+            $this->addRowError($message, $rowNum, $attrCode);
         } else if (!empty($attrParams['is_unique'])) {
             if (isset($this->_uniqueAttributes[$attrCode][$rowData[$attrCode]])) {
                 $this->addRowError(Mage::helper('importexport')->__("Duplicate Unique Attribute for '%s'"), $rowNum, $attrCode);
@@ -594,6 +583,40 @@ class Mash2_Cobby_Model_Import_Entity_Product extends Mage_ImportExport_Model_Im
         }
 
         return (bool)$valid;
+    }
+
+    /**
+     * @param string $errorCode
+     * @param int $errorRowNum
+     * @param null $colName
+     * @return Cobby_Connector_Model_Import_Entity_Product
+     */
+    public function addRowError($errorCode, $errorRowNum, $colName = null)
+    {
+        $sku = $this->_source->current()['sku'];
+        //Error Object
+        $error =  array(
+            'sku' => $sku,
+            "entity_id" => $this->_source->current()['_id'],
+            "error" => true,
+            "attribute_code" => $colName,
+            "attribute_value" => $this->_source->current()[$colName],
+            "message" => $errorCode
+        );
+
+        $this->_errors[$sku][] = $error; //Array with all errors
+        $this->_invalidRows[$errorRowNum] = true;
+        $this->_errorsCount ++;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorMessages()
+    {
+        return $this->_errors;
     }
 
     /**

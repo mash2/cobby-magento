@@ -1,4 +1,9 @@
 <?php
+/*
+ * @copyright Copyright (c) 2021 mash2 GmbH & Co. KG. All rights reserved.
+ * @license http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0).
+ */
+
 class Mash2_Cobby_Model_Import_Product_Link extends Mash2_Cobby_Model_Import_Product_Abstract
 {
 
@@ -30,9 +35,8 @@ class Mash2_Cobby_Model_Import_Product_Link extends Mash2_Cobby_Model_Import_Pro
     public function __construct()
     {
         parent::__construct();
-
-        $this->linkTable = $this->resourceModel->getTableName('catalog_product_link');
-        $this->resourceHelper = Mage::helper('mash2_cobby/resource');
+        $this->linkTable = $this->resourceModel->getTableName('catalog_product_link', 'link_id');
+        $this->resourceHelper = Mage::helper('cobby_connector/resource');
     }
 
     public function import($rows)
@@ -40,7 +44,7 @@ class Mash2_Cobby_Model_Import_Product_Link extends Mash2_Cobby_Model_Import_Pro
         $result = array();
 
         $positionAttrId = array();
-        $nextLinkId     = $this->resourceHelper->getNextAutoincrement($this->linkTable);
+        $nextLinkId     = $this->resourceHelper->getNextAutoincrement($this->linkTable, 'link_id');
 
         // pre-load 'position' attributes ID for each link type once
         foreach ($this->linkNameToId as $linkName => $linkTypeId) {
