@@ -2,6 +2,6 @@
 	"name" : "mash2/cobby-magento",
 	"description" : "This extension for Magento provides a direct integration of the cobby management methods to your Magento shop.",
 	"license": "OSL-3.0",
-	"version" : "1.56.1-beta",
+	"version" : "1.56.1",
 	"type" : "magento-module"
 }
