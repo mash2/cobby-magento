@@ -36,7 +36,7 @@ class Mash2_Cobby_Model_Import_Product_Link extends Mash2_Cobby_Model_Import_Pro
     {
         parent::__construct();
         $this->linkTable = $this->resourceModel->getTableName('catalog_product_link', 'link_id');
-        $this->resourceHelper = Mage::helper('cobby_connector/resource');
+        $this->resourceHelper = Mage::helper('mash2_cobby/resource');
     }
 
     public function import($rows)
